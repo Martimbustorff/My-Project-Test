@@ -1,26 +1,50 @@
 /**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
+ * Trading Bot color palette — dark theme optimised for financial data.
+ * Brand: Superman Blue #0057A6
  */
 
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
-
 export const Colors = {
+  // Brand
+  primary:   '#0057A6',
+  primaryLight: '#1A6FBF',
+
+  // Backgrounds
+  background:  '#0A0F1E',
+  surface:     '#111827',
+  surfaceAlt:  '#1A2235',
+  border:      '#1E2D45',
+
+  // Text
+  text:        '#F0F4FF',
+  textSecondary: '#8A9BB5',
+  textMuted:   '#4A5568',
+
+  // Financial
+  green:  '#00D4AA',
+  red:    '#FF4757',
+  yellow: '#FFD93D',
+  blue:   '#4B9EFF',
+
+  // Tab bar (dark)
+  tabBar:         '#0D1526',
+  tabIconDefault: '#4A5568',
+  tabIconSelected:'#0057A6',
+
+  // Legacy (keep for existing components)
   light: {
-    text: '#11181C',
-    background: '#fff',
-    tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
+    text: '#F0F4FF',
+    background: '#0A0F1E',
+    tint: '#0057A6',
+    icon: '#8A9BB5',
+    tabIconDefault: '#4A5568',
+    tabIconSelected: '#0057A6',
   },
   dark: {
-    text: '#ECEDEE',
-    background: '#151718',
-    tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
+    text: '#F0F4FF',
+    background: '#0A0F1E',
+    tint: '#0057A6',
+    icon: '#8A9BB5',
+    tabIconDefault: '#4A5568',
+    tabIconSelected: '#0057A6',
   },
 };

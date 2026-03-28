@@ -1,37 +1,34 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
-
-import { TabBarIcon } from '@/components/navigation/TabBarIcon';
+import { Text } from 'react-native';
 import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false,
-      }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'home' : 'home-outline'} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="explore"
-        options={{
-          title: 'Explore',
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'code-slash' : 'code-slash-outline'} color={color} />
-          ),
-        }}
-      />
+        tabBarStyle: {
+          backgroundColor: Colors.tabBar,
+          borderTopColor: Colors.border,
+          borderTopWidth: 1,
+          height: 60,
+          paddingBottom: 8,
+        },
+        tabBarActiveTintColor: Colors.primary,
+        tabBarInactiveTintColor: Colors.tabIconDefault,
+        tabBarLabelStyle: { fontSize: 11, fontWeight: '600' },
+      }}
+    >
+      <Tabs.Screen name="index"    options={{ title: 'Portfolio', tabBarIcon: ({ color }) => <TabBarEmoji emoji="📊" color={color} /> }} />
+      <Tabs.Screen name="signals"  options={{ title: 'Signals',   tabBarIcon: ({ color }) => <TabBarEmoji emoji="⚡" color={color} /> }} />
+      <Tabs.Screen name="trades"   options={{ title: 'Trades',    tabBarIcon: ({ color }) => <TabBarEmoji emoji="📋" color={color} /> }} />
+      <Tabs.Screen name="backtest" options={{ title: 'Backtest',  tabBarIcon: ({ color }) => <TabBarEmoji emoji="🔬" color={color} /> }} />
+      <Tabs.Screen name="settings" options={{ title: 'Settings',  tabBarIcon: ({ color }) => <TabBarEmoji emoji="⚙️" color={color} /> }} />
     </Tabs>
   );
+}
+
+function TabBarEmoji({ emoji, color }: { emoji: string; color: string }) {
+  return <Text style={{ fontSize: 22, opacity: color === Colors.primary ? 1 : 0.5 }}>{emoji}</Text>;
 }
