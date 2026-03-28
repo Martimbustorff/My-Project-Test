@@ -1,13 +1,7 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
+import { Text } from 'react-native';
 import { Colors } from '@/constants/Colors';
-
-function TabIcon({ name, focused }: { name: string; focused: boolean }) {
-  const icons: Record<string, string> = {
-    index: '📊', signals: '⚡', trades: '📋', backtest: '🔬', settings: '⚙️',
-  };
-  return null; // Text icons via tabBarLabel
-}
 
 export default function TabLayout() {
   return (
@@ -36,6 +30,5 @@ export default function TabLayout() {
 }
 
 function TabBarEmoji({ emoji, color }: { emoji: string; color: string }) {
-  const { Text } = require('react-native');
   return <Text style={{ fontSize: 22, opacity: color === Colors.primary ? 1 : 0.5 }}>{emoji}</Text>;
 }
