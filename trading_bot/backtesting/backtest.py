@@ -361,9 +361,11 @@ class Backtester:
         self,
         config: BacktestConfig,
         technical_analyzer=None,
+        signal_generator=None,
     ):
         self.cfg = config
         self._tech = technical_analyzer or self._default_analyzer()
+        self._signal_generator = signal_generator  # optional live SignalGenerator; not used in offline backtest
 
     # ── Public ───────────────────────────────────────────────────────────────
 
@@ -585,6 +587,61 @@ class Backtester:
         return float(hist["close"].iloc[-1])
 
     # ── Indicators & scoring ─────────────────────────────────────────────────
+
+    def _apply_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Apply technical indicators using pandas-ta.
+
+        Called on the full per-symbol DataFrame before the main loop so that
+        all derived columns (RSI, MACD, BBands, ATR, SMAs) are available for
+        slicing on each bar without re-computing every day.
+        """
+        try:
+            import pandas_ta as ta  # noqa: F401
+        except ImportError:
+            raise ImportError(
+                "pandas-ta is required for backtesting.  "
+                "Install it with:  pip install pandas-ta"
+            )
+        df = df.copy()
+        df.ta.rsi(length=14, append=True)
+        df.ta.macd(fast=12, slow=26, signal=9, append=True)
+        df.ta.bbands(length=20, std=2, append=True)
+        df.ta.atr(length=14, append=True)
+        df.ta.sma(length=50,  append=True)
+        df.ta.sma(length=200, append=True)
+        return df
+
+    def _compute_signal_score(self, df: pd.DataFrame) -> float:
+        """Simple multi-factor score from -1 to +1.
+
+        Factors (equal weight):
+          1. RSI  – oversold (+) / overbought (-)
+          2. MACD histogram direction  (+/-)
+          3. Price vs SMA50 / SMA200  (trend)
+          4. Bollinger Band position   (mean-reversion)
+          5. 5-day rate-of-change momentum
+
+        Delegates to :meth:`_score_symbol` which holds the full implementation.
+        """
+        return self._score_symbol(df)
+
+    def _calculate_shares(
+        self,
+        price: float,
+        atr: float,
+        portfolio_value: float,
+        side: str,
+    ) -> tuple[int, float, float]:
+        """Returns (shares, stop_price, take_profit_price).
+
+        ATR-based fixed-fractional sizing that mirrors the live RiskManager:
+        - Stop distance = max(ATR * atr_stop_multiplier, price * stop_loss_pct)
+        - Dollar risk   = portfolio_value * risk_per_trade
+        - Hard cap      = portfolio_value * max_position_size
+
+        Delegates to :meth:`_size_position` which holds the full implementation.
+        """
+        return self._size_position(price, atr, portfolio_value, side)
 
     @staticmethod
     def _default_analyzer():
