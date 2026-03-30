@@ -80,18 +80,21 @@ class MarketScanner:
                     results.append(res)
 
         # Sort into longs and shorts
+        # Only show clear BUY/STRONG BUY for longs (not HOLDs)
         top_longs = sorted(
-            [r for r in results if r.consensus_score >= 0.2],
+            [r for r in results if r.recommendation in ("BUY", "STRONG BUY") and r.consensus_score > 0],
             key=lambda r: r.consensus_score,
             reverse=True,
         )[:15]
 
+        # Only show clear SELL/STRONG SELL for shorts
         top_shorts = sorted(
-            [r for r in results if r.consensus_score <= -0.2],
+            [r for r in results if r.recommendation in ("SELL", "STRONG SELL") and r.consensus_score < 0],
             key=lambda r: r.consensus_score,
         )[:8]
 
         def _summary(r) -> dict:
+            agents_agree = len(r.bull_agents) if r.consensus_score >= 0 else len(r.bear_agents)
             return {
                 "symbol": r.symbol,
                 "price": r.price,
@@ -101,6 +104,7 @@ class MarketScanner:
                 "direction": r.direction,
                 "confidence": round(r.confidence, 3),
                 "agreement_pct": round(r.agreement_pct, 1),
+                "agents_agree": agents_agree,
                 "key_reasons": r.key_reasons[:2],
                 "bull_agents": r.bull_agents,
                 "bear_agents": r.bear_agents,

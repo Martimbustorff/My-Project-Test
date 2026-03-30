@@ -120,13 +120,13 @@ class ConsensusResult:
 
     @staticmethod
     def score_to_signal(score: float) -> str:
-        if score >= 0.6:
+        if score >= 0.5:
             return "STRONG BUY"
-        if score >= 0.25:
+        if score >= 0.15:
             return "BUY"
-        if score > -0.25:
+        if score > -0.15:
             return "HOLD"
-        if score > -0.6:
+        if score > -0.5:
             return "SELL"
         return "STRONG SELL"
 
@@ -824,8 +824,8 @@ class ConsensusEngine:
                 self._compute_consensus(votes)
 
             # Classify bull vs bear agents
-            bull_agents = [v.agent_name for v in votes if v.score >= 0.25]
-            bear_agents = [v.agent_name for v in votes if v.score <= -0.25]
+            bull_agents = [v.agent_name for v in votes if v.score >= 0.15]
+            bear_agents = [v.agent_name for v in votes if v.score <= -0.15]
 
             # Build key reasons from aligned agents
             key_reasons: List[str] = []
@@ -935,13 +935,12 @@ class ConsensusEngine:
         confidence = float(max(0.0, min(1.0, confidence)))
 
         # Agreement: fraction of agents whose signal matches the consensus direction
-        if weighted_score >= 0.25:
-            agreeing = sum(1 for v in votes if v.score >= 0.25)
-        elif weighted_score <= -0.25:
-            agreeing = sum(1 for v in votes if v.score <= -0.25)
+        if weighted_score >= 0.15:
+            agreeing = sum(1 for v in votes if v.score >= 0.15)
+        elif weighted_score <= -0.15:
+            agreeing = sum(1 for v in votes if v.score <= -0.15)
         else:
-            # HOLD: agents near neutral agree
-            agreeing = sum(1 for v in votes if abs(v.score) < 0.25)
+            agreeing = sum(1 for v in votes if abs(v.score) < 0.15)
         agreement_pct = agreeing / len(votes) * 100 if votes else 0.0
 
         return weighted_score, recommendation, direction, confidence, agreement_pct
