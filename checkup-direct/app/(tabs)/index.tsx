@@ -1,205 +1,484 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
-  View, Text, ScrollView, RefreshControl, StyleSheet,
-  TouchableOpacity, ActivityIndicator,
+  View, Text, FlatList, StyleSheet, TouchableOpacity,
+  Modal, TextInput, Pressable, ActivityIndicator, Alert, ScrollView
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '@/constants/Colors';
-import { StatCard } from '@/components/StatCard';
-import { MiniChart } from '@/components/MiniChart';
-import { apiGet } from '@/constants/Api';
+import { apiGet, apiPost, API_BASE_URL } from '@/constants/Api';
 
-interface PortfolioSummary {
-  portfolio_value: number;
-  equity: number;
-  cash: number;
-  daily_pnl: number;
-  daily_pnl_pct: number;
-  long_positions: number;
-  short_positions: number;
-  net_exposure_pct: number;
-  gross_exposure_pct: number;
-  unrealized_pnl: number;
-  last_updated: string;
-}
-
-interface EquityPoint { timestamp: string; value: number }
-
+// Types
 interface Position {
+  id: number;
   symbol: string;
-  side: string;
-  entry_price: number;
-  shares: number;
+  quantity: number;
+  avg_cost: number;
+  direction: 'LONG' | 'SHORT';
+  current_price: number | null;
+  current_value: number | null;
+  pnl: number | null;
+  pnl_pct: number | null;
+  recommendation?: string;
+  consensus_score?: number;
 }
 
-function fmt$(v: number) { return `$${Math.abs(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`; }
-function fmtPct(v: number) { return `${v >= 0 ? '+' : ''}${(v * 100).toFixed(2)}%`; }
-function pnlColor(v: number) { return v >= 0 ? Colors.green : Colors.red; }
+interface Summary {
+  total_value: number;
+  total_cost: number;
+  total_pnl: number;
+  total_pnl_pct: number;
+  position_count: number;
+}
 
-export default function DashboardScreen() {
-  const [summary, setSummary]   = useState<PortfolioSummary | null>(null);
-  const [equity, setEquity]     = useState<EquityPoint[]>([]);
-  const [positions, setPositions] = useState<Position[]>([]);
-  const [loading, setLoading]   = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [error, setError]       = useState<string | null>(null);
+// Helpers
+function fmt$(v: number) {
+  return `$${Math.abs(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
+function fmtPct(v: number) {
+  return `${v >= 0 ? '+' : ''}${v.toFixed(2)}%`;
+}
+
+function pnlColor(v: number) {
+  return v >= 0 ? Colors.green : Colors.red;
+}
+
+function recoBadgeColor(rec?: string): string {
+  if (!rec) return Colors.textSecondary;
+  const u = rec.toUpperCase();
+  if (u === 'STRONG BUY')  return '#00D4AA';
+  if (u === 'BUY')         return '#00A86B';
+  if (u === 'HOLD')        return '#FFD700';
+  if (u === 'SELL')        return '#FF8C00';
+  if (u === 'STRONG SELL') return '#FF4757';
+  return Colors.textSecondary;
+}
+
+// Direction Badge
+function DirectionBadge({ direction }: { direction: 'LONG' | 'SHORT' }) {
+  const isLong = direction === 'LONG';
+  const color = isLong ? Colors.green : Colors.red;
+  return (
+    <View style={[styles.dirBadge, { backgroundColor: color + '22', borderColor: color }]}>
+      <Text style={[styles.dirBadgeText, { color }]}>{direction}</Text>
+    </View>
+  );
+}
+
+// Recommendation Badge
+function RecoBadge({ rec }: { rec?: string }) {
+  if (!rec) return null;
+  const color = recoBadgeColor(rec);
+  return (
+    <View style={[styles.recoBadge, { backgroundColor: color + '22', borderColor: color }]}>
+      <Text style={[styles.recoBadgeText, { color }]}>{rec.toUpperCase()}</Text>
+    </View>
+  );
+}
+
+// Position Card
+function PositionCard({ item, onLongPress }: { item: Position; onLongPress: () => void }) {
+  const pnl = item.pnl ?? 0;
+  const pnlPct = item.pnl_pct ?? 0;
+  const hasPnl = item.pnl !== null;
+
+  return (
+    <TouchableOpacity style={styles.posCard} onLongPress={onLongPress} activeOpacity={0.85}>
+      {/* Row 1: direction badge + symbol | P&L $ */}
+      <View style={styles.posRow1}>
+        <View style={styles.posRow1Left}>
+          <DirectionBadge direction={item.direction} />
+          <Text style={styles.posSymbol}>{item.symbol}</Text>
+        </View>
+        {hasPnl && (
+          <Text style={[styles.posPnlDollar, { color: pnlColor(pnl) }]}>
+            {pnl >= 0 ? '+' : '-'}{fmt$(pnl)}
+          </Text>
+        )}
+      </View>
+
+      {/* Row 2: Qty | Avg | Now */}
+      <View style={styles.posRow2}>
+        <Text style={styles.posMetaText}>Qty: {item.quantity}</Text>
+        <Text style={styles.posMetaSep}>·</Text>
+        <Text style={styles.posMetaText}>Avg: ${item.avg_cost.toFixed(2)}</Text>
+        <Text style={styles.posMetaSep}>·</Text>
+        <Text style={styles.posMetaText}>
+          Now: {item.current_price != null ? `$${item.current_price.toFixed(2)}` : '—'}
+        </Text>
+      </View>
+
+      {/* Row 3: P&L % | recommendation badge */}
+      <View style={styles.posRow3}>
+        {hasPnl && (
+          <Text style={[styles.posPnlPct, { color: pnlColor(pnlPct) }]}>
+            {fmtPct(pnlPct)}
+          </Text>
+        )}
+        {item.recommendation && <RecoBadge rec={item.recommendation} />}
+      </View>
+    </TouchableOpacity>
+  );
+}
+
+// Add Position Modal
+interface AddModalProps {
+  visible: boolean;
+  onClose: () => void;
+  onAdded: () => void;
+}
+
+function AddPositionModal({ visible, onClose, onAdded }: AddModalProps) {
+  const [symbol, setSymbol]       = useState('');
+  const [quantity, setQuantity]   = useState('');
+  const [avgCost, setAvgCost]     = useState('');
+  const [direction, setDirection] = useState<'LONG' | 'SHORT'>('LONG');
+  const [saving, setSaving]       = useState(false);
+
+  const reset = () => {
+    setSymbol('');
+    setQuantity('');
+    setAvgCost('');
+    setDirection('LONG');
+  };
+
+  const handleAdd = async () => {
+    const sym = symbol.trim().toUpperCase();
+    if (!sym) { Alert.alert('Error', 'Enter a symbol.'); return; }
+    const qty = parseFloat(quantity);
+    const cost = parseFloat(avgCost);
+    if (!qty || qty <= 0) { Alert.alert('Error', 'Enter a valid quantity.'); return; }
+    if (!cost || cost <= 0) { Alert.alert('Error', 'Enter a valid average cost.'); return; }
+
+    setSaving(true);
+    try {
+      await apiPost('/api/positions/positions', { symbol: sym, quantity: qty, avg_cost: cost, direction });
+      reset();
+      onAdded();
+      onClose();
+    } catch (e: any) {
+      Alert.alert('Error', e.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
+      <Pressable style={styles.modalOverlay} onPress={onClose}>
+        <Pressable style={styles.modalSheet} onPress={() => {}}>
+          <Text style={styles.modalTitle}>Add Position</Text>
+
+          <Text style={styles.modalLabel}>Symbol</Text>
+          <TextInput
+            style={styles.modalInput}
+            value={symbol}
+            onChangeText={t => setSymbol(t.toUpperCase())}
+            autoCapitalize="characters"
+            placeholder="e.g. AAPL"
+            placeholderTextColor={Colors.textMuted}
+          />
+
+          <Text style={styles.modalLabel}>Quantity</Text>
+          <TextInput
+            style={styles.modalInput}
+            value={quantity}
+            onChangeText={setQuantity}
+            keyboardType="numeric"
+            placeholder="e.g. 10"
+            placeholderTextColor={Colors.textMuted}
+          />
+
+          <Text style={styles.modalLabel}>Average Cost</Text>
+          <TextInput
+            style={styles.modalInput}
+            value={avgCost}
+            onChangeText={setAvgCost}
+            keyboardType="numeric"
+            placeholder="$ per share"
+            placeholderTextColor={Colors.textMuted}
+          />
+
+          <Text style={styles.modalLabel}>Direction</Text>
+          <View style={styles.dirToggle}>
+            <TouchableOpacity
+              style={[styles.dirToggleBtn, direction === 'LONG' && { borderColor: Colors.green, backgroundColor: Colors.green + '22' }]}
+              onPress={() => setDirection('LONG')}
+            >
+              <Text style={[styles.dirToggleBtnText, direction === 'LONG' && { color: Colors.green }]}>LONG</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.dirToggleBtn, direction === 'SHORT' && { borderColor: Colors.red, backgroundColor: Colors.red + '22' }]}
+              onPress={() => setDirection('SHORT')}
+            >
+              <Text style={[styles.dirToggleBtnText, direction === 'SHORT' && { color: Colors.red }]}>SHORT</Text>
+            </TouchableOpacity>
+          </View>
+
+          <TouchableOpacity
+            style={[styles.addBtn, saving && { opacity: 0.6 }]}
+            onPress={handleAdd}
+            disabled={saving}
+          >
+            {saving
+              ? <ActivityIndicator color="#fff" size="small" />
+              : <Text style={styles.addBtnText}>Add Position</Text>}
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.cancelBtn} onPress={() => { reset(); onClose(); }}>
+            <Text style={styles.cancelBtnText}>Cancel</Text>
+          </TouchableOpacity>
+        </Pressable>
+      </Pressable>
+    </Modal>
+  );
+}
+
+// Main Screen
+export default function PortfolioScreen() {
+  const [positions, setPositions]   = useState<Position[]>([]);
+  const [summary, setSummary]       = useState<Summary | null>(null);
+  const [loading, setLoading]       = useState(true);
+  const [error, setError]           = useState<string | null>(null);
+  const [showModal, setShowModal]   = useState(false);
 
   const load = useCallback(async () => {
     try {
       setError(null);
-      const [sum, eq, pos] = await Promise.all([
-        apiGet<PortfolioSummary>('/api/portfolio/summary'),
-        apiGet<EquityPoint[]>('/api/portfolio/equity-curve?days=30'),
-        apiGet<{ positions: Position[] }>('/api/portfolio/positions'),
+      const [pos, sum] = await Promise.all([
+        apiGet<Position[]>('/api/positions/positions'),
+        apiGet<Summary>('/api/positions/summary'),
       ]);
+      setPositions(Array.isArray(pos) ? pos : []);
       setSummary(sum);
-      setEquity(eq);
-      setPositions(pos.positions || []);
     } catch (e: any) {
       setError(e.message);
     } finally {
       setLoading(false);
-      setRefreshing(false);
     }
   }, []);
 
   useEffect(() => { load(); }, [load]);
-
-  // Auto-refresh every 15 seconds
   useEffect(() => {
-    const interval = setInterval(load, 15_000);
+    const interval = setInterval(load, 30_000);
     return () => clearInterval(interval);
   }, [load]);
 
-  if (loading) return (
-    <View style={styles.center}>
-      <ActivityIndicator size="large" color={Colors.primary} />
-      <Text style={styles.loadingText}>Loading portfolio…</Text>
-    </View>
-  );
+  const handleDelete = (pos: Position) => {
+    Alert.alert(
+      'Delete position?',
+      `Remove ${pos.symbol} from your portfolio?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete', style: 'destructive', onPress: async () => {
+            try {
+              const token = await AsyncStorage.getItem('auth_token');
+              const res = await fetch(`${API_BASE_URL}/api/positions/positions/${pos.id}`, {
+                method: 'DELETE',
+                headers: { Authorization: `Bearer ${token}` },
+              });
+              if (!res.ok) throw new Error(`API error ${res.status}`);
+              setPositions(prev => prev.filter(p => p.id !== pos.id));
+            } catch (e: any) {
+              Alert.alert('Error', e.message);
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator size="large" color={Colors.primary} />
+        <Text style={styles.loadingText}>Loading portfolio...</Text>
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView
-        contentContainerStyle={styles.scroll}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); load(); }} tintColor={Colors.primary} />}
-      >
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Portfolio</Text>
-          {summary?.last_updated && (
-            <Text style={styles.headerSub}>
-              {new Date(summary.last_updated).toLocaleTimeString()}
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>My Portfolio</Text>
+        <TouchableOpacity style={styles.addHeaderBtn} onPress={() => setShowModal(true)}>
+          <Text style={styles.addHeaderBtnText}>+</Text>
+        </TouchableOpacity>
+      </View>
+
+      {error && (
+        <View style={styles.errorBanner}>
+          <Text style={styles.errorText}>
+            {error === 'UNAUTHORIZED' ? '⚠ Session expired' : '⚠ Could not reach API server'}
+          </Text>
+        </View>
+      )}
+
+      {/* Summary bar */}
+      {summary && (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.summaryBar}
+        >
+          <View style={styles.summaryItem}>
+            <Text style={styles.summaryLabel}>Total Value</Text>
+            <Text style={styles.summaryValue}>{fmt$(summary.total_value)}</Text>
+          </View>
+          <View style={styles.summaryDivider} />
+          <View style={styles.summaryItem}>
+            <Text style={styles.summaryLabel}>Daily P&L %</Text>
+            <Text style={[styles.summaryValue, { color: pnlColor(summary.total_pnl) }]}>
+              {fmtPct(summary.total_pnl_pct)}
             </Text>
-          )}
-        </View>
-
-        {error && (
-          <View style={styles.errorBanner}>
-            <Text style={styles.errorText}>⚠ {error === 'UNAUTHORIZED' ? 'Session expired' : 'Could not reach API server'}</Text>
           </View>
+          <View style={styles.summaryDivider} />
+          <View style={styles.summaryItem}>
+            <Text style={styles.summaryLabel}>Positions</Text>
+            <Text style={styles.summaryValue}>{summary.position_count}</Text>
+          </View>
+        </ScrollView>
+      )}
+
+      <FlatList
+        data={positions}
+        keyExtractor={item => String(item.id)}
+        contentContainerStyle={styles.listContent}
+        ListEmptyComponent={
+          <View style={styles.empty}>
+            <Text style={styles.emptyText}>No positions yet{'\n'}Tap + to add your eToro holdings</Text>
+          </View>
+        }
+        renderItem={({ item }) => (
+          <PositionCard item={item} onLongPress={() => handleDelete(item)} />
         )}
+      />
 
-        {/* Portfolio Value */}
-        <View style={styles.heroCard}>
-          <Text style={styles.heroLabel}>TOTAL VALUE</Text>
-          <Text style={styles.heroValue}>{fmt$(summary?.portfolio_value ?? 0)}</Text>
-          <View style={styles.heroRow}>
-            <Text style={[styles.heroPnl, { color: pnlColor(summary?.daily_pnl ?? 0) }]}>
-              {summary && summary.daily_pnl >= 0 ? '▲' : '▼'} {fmt$(summary?.daily_pnl ?? 0)} today
-            </Text>
-            <Text style={[styles.heroPct, { color: pnlColor(summary?.daily_pnl_pct ?? 0) }]}>
-              {fmtPct(summary?.daily_pnl_pct ?? 0)}
-            </Text>
-          </View>
-        </View>
-
-        {/* Equity Curve */}
-        {equity.length > 1 && (
-          <View style={styles.chartCard}>
-            <Text style={styles.sectionTitle}>30-Day Equity</Text>
-            <MiniChart data={equity} height={130} />
-          </View>
-        )}
-
-        {/* Stats row */}
-        <View style={styles.row}>
-          <StatCard label="Cash" value={fmt$(summary?.cash ?? 0)} flex={1} />
-          <View style={{ width: 8 }} />
-          <StatCard label="Unrealised P&L" value={fmt$(summary?.unrealized_pnl ?? 0)}
-            valueColor={pnlColor(summary?.unrealized_pnl ?? 0)} flex={1} />
-        </View>
-
-        <View style={styles.row}>
-          <StatCard label="Long" value={String(summary?.long_positions ?? 0)} subValue="positions" flex={1} />
-          <View style={{ width: 8 }} />
-          <StatCard label="Short" value={String(summary?.short_positions ?? 0)} subValue="positions" flex={1} />
-          <View style={{ width: 8 }} />
-          <StatCard label="Net Exp." value={fmtPct(summary?.net_exposure_pct ?? 0)}
-            valueColor={pnlColor(summary?.net_exposure_pct ?? 0)} flex={1} />
-        </View>
-
-        {/* Open Positions */}
-        {positions.length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Open Positions</Text>
-            {positions.map((p, i) => (
-              <View key={i} style={styles.positionRow}>
-                <View style={styles.positionLeft}>
-                  <Text style={styles.positionSymbol}>{p.symbol}</Text>
-                  <View style={[styles.sideBadge, p.side === 'BUY' ? styles.longBadge : styles.shortBadge]}>
-                    <Text style={styles.sideBadgeText}>{p.side === 'BUY' ? 'LONG' : 'SHORT'}</Text>
-                  </View>
-                </View>
-                <View style={styles.positionRight}>
-                  <Text style={styles.positionShares}>{p.shares} shares</Text>
-                  <Text style={styles.positionEntry}>@ ${p.entry_price?.toFixed(2)}</Text>
-                </View>
-              </View>
-            ))}
-          </View>
-        )}
-      </ScrollView>
+      <AddPositionModal
+        visible={showModal}
+        onClose={() => setShowModal(false)}
+        onAdded={load}
+      />
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
-  scroll: { padding: 16, paddingBottom: 40 },
   center: { flex: 1, backgroundColor: Colors.background, alignItems: 'center', justifyContent: 'center' },
   loadingText: { color: Colors.textSecondary, marginTop: 12 },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
-  headerTitle: { fontSize: 26, fontWeight: 'bold', color: Colors.text },
-  headerSub: { fontSize: 12, color: Colors.textMuted },
-  errorBanner: { backgroundColor: '#3D1010', borderRadius: 8, padding: 12, marginBottom: 12 },
-  errorText: { color: Colors.red, fontSize: 13 },
-  heroCard: {
-    backgroundColor: Colors.surface, borderRadius: 16, padding: 20,
-    marginBottom: 12, borderWidth: 1, borderColor: Colors.border,
+
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 8,
   },
-  heroLabel: { fontSize: 11, color: Colors.textSecondary, letterSpacing: 1.5, textTransform: 'uppercase' },
-  heroValue: { fontSize: 42, fontWeight: '800', color: Colors.text, marginTop: 4 },
-  heroRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 8 },
-  heroPnl: { fontSize: 16, fontWeight: '600' },
-  heroPct: { fontSize: 16, fontWeight: '600' },
-  chartCard: { backgroundColor: Colors.surface, borderRadius: 16, padding: 16, marginBottom: 12, borderWidth: 1, borderColor: Colors.border },
-  sectionTitle: { fontSize: 13, fontWeight: '700', color: Colors.textSecondary, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 12 },
-  row: { flexDirection: 'row', marginBottom: 8 },
-  section: { marginTop: 8 },
-  positionRow: {
-    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    backgroundColor: Colors.surface, borderRadius: 12, padding: 14, marginBottom: 6,
-    borderWidth: 1, borderColor: Colors.border,
+  headerTitle: { fontSize: 26, fontWeight: 'bold', color: Colors.text },
+  addHeaderBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: Colors.green,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  positionLeft: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  positionSymbol: { fontSize: 16, fontWeight: '700', color: Colors.text },
-  sideBadge: { borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2 },
-  longBadge: { backgroundColor: Colors.green + '22' },
-  shortBadge: { backgroundColor: Colors.red + '22' },
-  sideBadgeText: { fontSize: 10, fontWeight: '700', color: Colors.green },
-  positionRight: { alignItems: 'flex-end' },
-  positionShares: { fontSize: 14, fontWeight: '600', color: Colors.text },
-  positionEntry: { fontSize: 12, color: Colors.textSecondary },
+  addHeaderBtnText: { color: '#fff', fontWeight: '700', fontSize: 22, lineHeight: 26 },
+
+  errorBanner: { marginHorizontal: 16, marginBottom: 8, backgroundColor: '#3D1010', borderRadius: 8, padding: 12 },
+  errorText: { color: Colors.red, fontSize: 13 },
+
+  summaryBar: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    gap: 0,
+  },
+  summaryItem: { alignItems: 'center', paddingHorizontal: 20 },
+  summaryLabel: { fontSize: 11, color: Colors.textSecondary, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 },
+  summaryValue: { fontSize: 16, fontWeight: '700', color: Colors.text },
+  summaryDivider: { width: 1, backgroundColor: Colors.border, marginVertical: 4 },
+
+  listContent: { paddingHorizontal: 16, paddingBottom: 40, paddingTop: 8 },
+
+  empty: { alignItems: 'center', paddingTop: 80 },
+  emptyText: { color: Colors.textSecondary, textAlign: 'center', lineHeight: 24, fontSize: 15 },
+
+  posCard: {
+    backgroundColor: Colors.surface,
+    borderRadius: 14,
+    padding: 14,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  posRow1: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
+  posRow1Left: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  posSymbol: { fontSize: 18, fontWeight: '800', color: Colors.text },
+  posPnlDollar: { fontSize: 16, fontWeight: '700' },
+
+  posRow2: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8 },
+  posMetaText: { fontSize: 13, color: Colors.textSecondary },
+  posMetaSep: { fontSize: 13, color: Colors.textMuted },
+
+  posRow3: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  posPnlPct: { fontSize: 13, fontWeight: '600' },
+
+  dirBadge: { borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2, borderWidth: 1 },
+  dirBadgeText: { fontSize: 10, fontWeight: '700', letterSpacing: 0.5 },
+
+  recoBadge: { borderRadius: 4, paddingHorizontal: 8, paddingVertical: 3, borderWidth: 1 },
+  recoBadgeText: { fontSize: 11, fontWeight: '700', letterSpacing: 0.5 },
+
+  // Modal
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.75)', justifyContent: 'flex-end' },
+  modalSheet: {
+    backgroundColor: Colors.surface,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    padding: 24,
+    paddingBottom: 48,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  modalTitle: { fontSize: 20, fontWeight: '800', color: Colors.text, marginBottom: 20, textAlign: 'center' },
+  modalLabel: { fontSize: 12, color: Colors.textSecondary, marginBottom: 6, marginTop: 14 },
+  modalInput: {
+    backgroundColor: Colors.surfaceAlt,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: 10,
+    height: 46,
+    paddingHorizontal: 14,
+    color: Colors.text,
+    fontSize: 15,
+  },
+  dirToggle: { flexDirection: 'row', gap: 10, marginTop: 4 },
+  dirToggleBtn: {
+    flex: 1,
+    height: 44,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.surfaceAlt,
+  },
+  dirToggleBtnText: { fontSize: 14, fontWeight: '700', color: Colors.textSecondary },
+
+  addBtn: {
+    backgroundColor: Colors.green,
+    borderRadius: 12,
+    height: 52,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 24,
+  },
+  addBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+  cancelBtn: { height: 48, alignItems: 'center', justifyContent: 'center', marginTop: 8 },
+  cancelBtnText: { color: Colors.textSecondary, fontSize: 15 },
 });

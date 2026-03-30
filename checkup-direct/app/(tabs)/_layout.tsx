@@ -20,10 +20,10 @@ export default function TabLayout() {
         tabBarLabelStyle: { fontSize: 11, fontWeight: '600' },
       }}
     >
-      <Tabs.Screen name="index"    options={{ title: 'Portfolio', tabBarIcon: ({ color }) => <TabBarEmoji emoji="📊" color={color} /> }} />
+      <Tabs.Screen name="index"    options={{ title: 'Portfolio', tabBarIcon: ({ color }) => <TabBarEmoji emoji="💼" color={color} /> }} />
+      <Tabs.Screen name="trades"   options={{ title: 'Scanner',   tabBarIcon: ({ color }) => <TabBarEmoji emoji="🔭" color={color} /> }} />
       <Tabs.Screen name="signals"  options={{ title: 'Signals',   tabBarIcon: ({ color }) => <TabBarEmoji emoji="⚡" color={color} /> }} />
-      <Tabs.Screen name="trades"   options={{ title: 'Trades',    tabBarIcon: ({ color }) => <TabBarEmoji emoji="📋" color={color} /> }} />
-      <Tabs.Screen name="backtest" options={{ title: 'Backtest',  tabBarIcon: ({ color }) => <TabBarEmoji emoji="🔬" color={color} /> }} />
+      <Tabs.Screen name="backtest" options={{ title: 'Analysis',  tabBarIcon: ({ color }) => <TabBarEmoji emoji="🔬" color={color} /> }} />
       <Tabs.Screen name="settings" options={{ title: 'Settings',  tabBarIcon: ({ color }) => <TabBarEmoji emoji="⚙️" color={color} /> }} />
     </Tabs>
   );
