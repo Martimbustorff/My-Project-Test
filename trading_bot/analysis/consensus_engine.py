@@ -5,8 +5,14 @@ They then "debate" by comparing their positions, and a weighted consensus is pro
 """
 import yfinance as yf
 import pandas as pd
-import pandas_ta as ta
 import json
+
+try:
+    import pandas_ta as ta
+    _HAS_TA = True
+except Exception:
+    ta = None  # type: ignore
+    _HAS_TA = False
 import sqlite3
 import os
 import logging
@@ -18,6 +24,64 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 logger = logging.getLogger(__name__)
 
 DB_PATH = os.environ.get("DB_PATH", "trading_bot.db")
+
+
+# ── Pure-pandas fallback indicators (used when pandas_ta unavailable) ──────
+
+def _calc_rsi(close: pd.Series, length: int = 14) -> pd.Series:
+    if _HAS_TA:
+        try:
+            return ta.rsi(close, length=length)
+        except Exception:
+            pass
+    delta = close.diff()
+    gain = delta.clip(lower=0).rolling(length).mean()
+    loss = (-delta.clip(upper=0)).rolling(length).mean()
+    rs = gain / loss.replace(0, float('nan'))
+    return 100 - 100 / (1 + rs)
+
+def _calc_ema(close: pd.Series, length: int) -> pd.Series:
+    if _HAS_TA:
+        try:
+            return ta.ema(close, length=length)
+        except Exception:
+            pass
+    return close.ewm(span=length, adjust=False).mean()
+
+def _calc_macd(close: pd.Series, fast=12, slow=26, signal=9):
+    if _HAS_TA:
+        try:
+            return ta.macd(close, fast=fast, slow=slow, signal=signal)
+        except Exception:
+            pass
+    ema_fast = close.ewm(span=fast, adjust=False).mean()
+    ema_slow = close.ewm(span=slow, adjust=False).mean()
+    macd_line = ema_fast - ema_slow
+    signal_line = macd_line.ewm(span=signal, adjust=False).mean()
+    hist = macd_line - signal_line
+    df = pd.DataFrame({
+        f'MACD_{fast}_{slow}_{signal}': macd_line,
+        f'MACDs_{fast}_{slow}_{signal}': signal_line,
+        f'MACDh_{fast}_{slow}_{signal}': hist,
+    })
+    return df
+
+def _calc_bbands(close: pd.Series, length: int = 20, std: float = 2.0):
+    if _HAS_TA:
+        try:
+            return ta.bbands(close, length=length, std=std)
+        except Exception:
+            pass
+    sma = close.rolling(length).mean()
+    stddev = close.rolling(length).std()
+    upper = sma + std * stddev
+    lower = sma - std * stddev
+    df = pd.DataFrame({
+        f'BBL_{length}_{std}': lower,
+        f'BBM_{length}_{std}': sma,
+        f'BBU_{length}_{std}': upper,
+    })
+    return df
 
 
 @dataclass
@@ -97,7 +161,7 @@ def technical_agent(ticker: yf.Ticker, hist: pd.DataFrame) -> AgentVote:
 
         # --- RSI(14) ---
         try:
-            rsi_series = ta.rsi(close, length=14)
+            rsi_series = _calc_rsi(close, length=14)
             if rsi_series is not None and not rsi_series.dropna().empty:
                 rsi = float(rsi_series.dropna().iloc[-1])
                 if rsi < 30:
@@ -121,7 +185,7 @@ def technical_agent(ticker: yf.Ticker, hist: pd.DataFrame) -> AgentVote:
 
         # --- MACD ---
         try:
-            macd_df = ta.macd(close, fast=12, slow=26, signal=9)
+            macd_df = _calc_macd(close, fast=12, slow=26, signal=9)
             if macd_df is not None and not macd_df.empty:
                 cols = list(macd_df.columns)
                 macd_val = float(macd_df[cols[0]].dropna().iloc[-1]) if not macd_df[cols[0]].dropna().empty else None
@@ -140,7 +204,7 @@ def technical_agent(ticker: yf.Ticker, hist: pd.DataFrame) -> AgentVote:
 
         # --- Bollinger Bands ---
         try:
-            bb = ta.bbands(close, length=20, std=2)
+            bb = _calc_bbands(close, length=20, std=2.0)
             if bb is not None and not bb.empty:
                 bb_cols = list(bb.columns)
                 bb_lower = float(bb[bb_cols[0]].dropna().iloc[-1]) if not bb[bb_cols[0]].dropna().empty else None
@@ -169,8 +233,8 @@ def technical_agent(ticker: yf.Ticker, hist: pd.DataFrame) -> AgentVote:
 
         # --- EMA 20/50 crossover ---
         try:
-            ema20 = ta.ema(close, length=20)
-            ema50 = ta.ema(close, length=50)
+            ema20 = _calc_ema(close, length=20)
+            ema50 = _calc_ema(close, length=50)
             if ema20 is not None and ema50 is not None:
                 ema20_val = ema20.dropna()
                 ema50_val = ema50.dropna()
@@ -475,7 +539,7 @@ def momentum_agent(ticker: yf.Ticker, hist: pd.DataFrame, spy_hist: pd.DataFrame
 
         # --- RSI momentum (rising vs falling RSI) ---
         try:
-            rsi_series = ta.rsi(close, length=14)
+            rsi_series = _calc_rsi(close, length=14)
             if rsi_series is not None:
                 rsi_clean = rsi_series.dropna()
                 if len(rsi_clean) >= 5:

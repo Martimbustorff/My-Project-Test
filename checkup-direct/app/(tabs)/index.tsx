@@ -153,7 +153,7 @@ function AddPositionModal({ visible, onClose, onAdded }: AddModalProps) {
 
     setSaving(true);
     try {
-      await apiPost('/api/positions/positions', { symbol: sym, quantity: qty, avg_cost: cost, direction });
+      await apiPost('/api/positions/', { symbol: sym, quantity: qty, avg_cost: cost, direction });
       reset();
       onAdded();
       onClose();
@@ -247,7 +247,7 @@ export default function PortfolioScreen() {
     try {
       setError(null);
       const [pos, sum] = await Promise.all([
-        apiGet<Position[]>('/api/positions/positions'),
+        apiGet<Position[]>('/api/positions/'),
         apiGet<Summary>('/api/positions/summary'),
       ]);
       setPositions(Array.isArray(pos) ? pos : []);
@@ -275,7 +275,7 @@ export default function PortfolioScreen() {
           text: 'Delete', style: 'destructive', onPress: async () => {
             try {
               const token = await AsyncStorage.getItem('auth_token');
-              const res = await fetch(`${API_BASE_URL}/api/positions/positions/${pos.id}`, {
+              const res = await fetch(`${API_BASE_URL}/api/positions/${pos.id}`, {
                 method: 'DELETE',
                 headers: { Authorization: `Bearer ${token}` },
               });

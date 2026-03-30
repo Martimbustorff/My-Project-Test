@@ -86,8 +86,8 @@ function OpportunityCard({ item, rank }: { item: Opportunity; rank: number }) {
       </View>
       <View style={styles.scoreRow}>
         <Text style={styles.scoreText}>
-          Score: <Text style={{ color: item.consensus_score > 0 ? Colors.green : Colors.red }}>
-            {item.consensus_score.toFixed(2)}
+          Score: <Text style={{ color: (item.consensus_score ?? 0) > 0 ? Colors.green : Colors.red }}>
+            {(item.consensus_score ?? 0).toFixed(2)}
           </Text>
         </Text>
         <Text style={styles.scoreText}>
