@@ -11,8 +11,13 @@ Run with:
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from api.routes import auth, portfolio, signals, trades, bot, backtest
+from api.database import init_db
 
 app = FastAPI(title="Trading Bot API", version="1.0.0")
+
+@app.on_event("startup")
+def startup():
+    init_db()
 
 app.add_middleware(
     CORSMiddleware,
