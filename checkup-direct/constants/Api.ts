@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 // Replace with your computer's local IP when testing on a physical device
 // Find it with: hostname -I (Linux/Mac: ipconfig getifaddr en0)
 // Both phone and computer must be on the same WiFi network
-export const API_BASE_URL = 'http://192.0.2.2:8000';
+export const API_BASE_URL = 'http://localhost:8000';
 
 export async function getAuthHeaders(): Promise<Record<string, string>> {
   const token = await AsyncStorage.getItem('auth_token');
