@@ -78,6 +78,51 @@ def init_db():
                 results_json  TEXT
             )
         """)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS user_portfolio (
+                id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id     INTEGER NOT NULL DEFAULT 1,
+                symbol      TEXT NOT NULL,
+                quantity    REAL NOT NULL,
+                avg_cost    REAL NOT NULL,
+                direction   TEXT NOT NULL DEFAULT 'LONG',
+                added_at    TEXT DEFAULT (datetime('now')),
+                notes       TEXT,
+                UNIQUE(user_id, symbol, direction)
+            )
+        """)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS watchlist (
+                id        INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id   INTEGER NOT NULL DEFAULT 1,
+                symbol    TEXT NOT NULL,
+                added_at  TEXT DEFAULT (datetime('now')),
+                UNIQUE(user_id, symbol)
+            )
+        """)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS analysis_cache (
+                symbol        TEXT PRIMARY KEY,
+                analyzed_at   TEXT,
+                price         REAL,
+                change_pct    REAL,
+                consensus_score REAL,
+                recommendation TEXT,
+                direction     TEXT,
+                confidence    REAL,
+                agreement_pct REAL,
+                details_json  TEXT
+            )
+        """)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS scanner_results (
+                id              INTEGER PRIMARY KEY AUTOINCREMENT,
+                scanned_at      TEXT DEFAULT (datetime('now')),
+                top_longs_json  TEXT,
+                top_shorts_json TEXT,
+                symbols_scanned INTEGER
+            )
+        """)
         conn.commit()
 
 # Keep old name as alias for backward compatibility
