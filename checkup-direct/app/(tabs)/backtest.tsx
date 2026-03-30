@@ -1,186 +1,270 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View, Text, ScrollView, StyleSheet, TouchableOpacity,
-  TextInput, ActivityIndicator, Alert, FlatList,
+  TextInput, ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '@/constants/Colors';
-import { apiGet, apiPost } from '@/constants/Api';
+import { apiGet } from '@/constants/Api';
 
-interface BacktestResult {
-  id: string;
-  symbols: string | string[];
-  start_date: string;
-  end_date: string;
-  total_return: number;
-  ann_return: number;
-  sharpe: number;
-  max_drawdown: number;
-  win_rate: number;
-  profit_factor: number;
-  total_trades: number;
-  status: string;
-  created_at: string;
+interface AgentVote {
+  agent_name: string;
+  score: number;
+  confidence: number;
+  signal: string;
+  reasons: string[];
+  weight: number;
 }
 
-function pctFmt(v: number) { return `${v >= 0 ? '+' : ''}${(v * 100).toFixed(2)}%`; }
-function pnlColor(v: number) { return v >= 0 ? Colors.green : Colors.red; }
+interface AnalysisResult {
+  symbol: string;
+  timestamp: string;
+  price: number;
+  change_pct: number;
+  votes: AgentVote[];
+  consensus_score: number;
+  recommendation: string;
+  direction: string;
+  confidence: number;
+  agreement_pct: number;
+  bull_agents: string[];
+  bear_agents: string[];
+  key_reasons: string[];
+  key_risks: string[];
+}
 
-function ResultCard({ result }: { result: BacktestResult }) {
-  const symbols = typeof result.symbols === 'string'
-    ? JSON.parse(result.symbols)
-    : result.symbols;
+const QUICK_SYMBOLS = ['AAPL', 'MSFT', 'NVDA', 'TSLA', 'BTC-USD'];
+
+const AGENT_ICONS: Record<string, string> = {
+  Technical:   '🔬',
+  Fundamental: '📊',
+  Momentum:    '📈',
+  Sentiment:   '📰',
+};
+
+function signalBadgeColor(rec: string): string {
+  const u = rec.toUpperCase();
+  if (u === 'STRONG BUY') return '#00D4AA';
+  if (u === 'BUY')         return '#00A86B';
+  if (u === 'HOLD')        return '#FFD700';
+  if (u === 'SELL')        return '#FF8C00';
+  if (u === 'STRONG SELL') return '#FF4757';
+  return Colors.textMuted;
+}
+
+function RecoBadge({ label }: { label: string }) {
+  const color = signalBadgeColor(label);
   return (
-    <View style={styles.resultCard}>
-      <View style={styles.resultHeader}>
-        <Text style={styles.resultSymbols}>{symbols.slice(0, 4).join(', ')}{symbols.length > 4 ? ` +${symbols.length - 4}` : ''}</Text>
-        <Text style={styles.resultDate}>{result.start_date} → {result.end_date}</Text>
-      </View>
-      <View style={styles.resultGrid}>
-        <View style={styles.resultMetric}>
-          <Text style={[styles.metricValue, { color: pnlColor(result.total_return) }]}>{pctFmt(result.total_return)}</Text>
-          <Text style={styles.metricLabel}>Return</Text>
-        </View>
-        <View style={styles.resultMetric}>
-          <Text style={[styles.metricValue, { color: result.sharpe >= 1 ? Colors.green : Colors.yellow }]}>{result.sharpe?.toFixed(2) ?? '—'}</Text>
-          <Text style={styles.metricLabel}>Sharpe</Text>
-        </View>
-        <View style={styles.resultMetric}>
-          <Text style={[styles.metricValue, { color: Colors.red }]}>{pctFmt(result.max_drawdown)}</Text>
-          <Text style={styles.metricLabel}>Max DD</Text>
-        </View>
-        <View style={styles.resultMetric}>
-          <Text style={styles.metricValue}>{((result.win_rate ?? 0) * 100).toFixed(0)}%</Text>
-          <Text style={styles.metricLabel}>Win Rate</Text>
-        </View>
-        <View style={styles.resultMetric}>
-          <Text style={styles.metricValue}>{result.profit_factor?.toFixed(2) ?? '—'}</Text>
-          <Text style={styles.metricLabel}>Profit F.</Text>
-        </View>
-        <View style={styles.resultMetric}>
-          <Text style={styles.metricValue}>{result.total_trades ?? 0}</Text>
-          <Text style={styles.metricLabel}>Trades</Text>
-        </View>
-      </View>
+    <View style={[styles.badge, { backgroundColor: color + '22', borderColor: color }]}>
+      <Text style={[styles.badgeText, { color }]}>{label.toUpperCase()}</Text>
     </View>
   );
 }
 
-const PRESET_SYMBOLS = ['AAPL,MSFT,NVDA', 'AAPL,MSFT,GOOGL,AMZN', 'JPM,GS,V,MA', 'XOM,CVX,NEE'];
+function ScoreBar({ score }: { score: number }) {
+  const abs = Math.abs(score);
+  const color = score > 0 ? Colors.green : score < 0 ? Colors.red : Colors.textMuted;
+  return (
+    <View style={styles.scoreBarBg}>
+      <View style={[styles.scoreBarFill, { width: `${Math.min(abs * 100, 100)}%`, backgroundColor: color }]} />
+    </View>
+  );
+}
 
-export default function BacktestScreen() {
-  const [symbols, setSymbols]     = useState('AAPL,MSFT,NVDA');
-  const [startDate, setStartDate] = useState('2023-01-01');
-  const [endDate, setEndDate]     = useState('2024-01-01');
-  const [capital, setCapital]     = useState('100000');
-  const [running, setRunning]     = useState(false);
-  const [jobId, setJobId]         = useState<string | null>(null);
-  const [results, setResults]     = useState<BacktestResult[]>([]);
-  const [loadingResults, setLoadingResults] = useState(true);
+function AgentCard({ vote }: { vote: AgentVote }) {
+  const icon = AGENT_ICONS[vote.agent_name] ?? '';
+  const agentLabel = `${icon} ${vote.agent_name} Analysis`;
+  return (
+    <View style={styles.agentCard}>
+      <Text style={styles.agentCardTitle}>{agentLabel}</Text>
+      <View style={styles.agentScoreRow}>
+        <View style={{ flex: 1, marginRight: 12 }}>
+          <ScoreBar score={vote.score} />
+        </View>
+        <Text style={[styles.agentScoreValue, {
+          color: vote.score > 0 ? Colors.green : vote.score < 0 ? Colors.red : Colors.textMuted,
+        }]}>
+          {vote.score >= 0 ? '+' : ''}{vote.score.toFixed(2)}
+        </Text>
+        <RecoBadge label={vote.signal} />
+      </View>
+      {vote.reasons && vote.reasons.length > 0 && (
+        <View style={styles.reasonsList}>
+          {vote.reasons.map((r, i) => (
+            <Text key={i} style={styles.bulletText}>• {r}</Text>
+          ))}
+        </View>
+      )}
+    </View>
+  );
+}
+
+export default function AnalysisScreen() {
+  const [symbol, setSymbol]       = useState('');
+  const [loading, setLoading]     = useState(false);
+  const [result, setResult]       = useState<AnalysisResult | null>(null);
   const [error, setError]         = useState<string | null>(null);
 
-  const loadResults = useCallback(async () => {
+  const analyze = useCallback(async (sym: string) => {
+    const s = sym.trim().toUpperCase();
+    if (!s) return;
+    setSymbol(s);
+    setLoading(true);
+    setError(null);
+    setResult(null);
     try {
-      const data = await apiGet<BacktestResult[]>('/api/backtest/results');
-      setResults(data);
+      const data = await apiGet<AnalysisResult>(`/api/analysis/${s}`);
+      setResult(data);
     } catch (e: any) {
-      setError(e.message);
+      setError(e.message === 'UNAUTHORIZED' ? 'Session expired' : e.message);
     } finally {
-      setLoadingResults(false);
+      setLoading(false);
     }
   }, []);
 
-  useEffect(() => { loadResults(); }, [loadResults]);
-
-  // Poll job status while running
-  useEffect(() => {
-    if (!jobId || !running) return;
-    const poll = setInterval(async () => {
-      try {
-        const status = await apiGet<{ status: string; error?: string }>(`/api/backtest/status/${jobId}`);
-        if (status.status === 'completed') {
-          setRunning(false);
-          setJobId(null);
-          loadResults();
-          clearInterval(poll);
-        } else if (status.status === 'failed') {
-          setRunning(false);
-          setJobId(null);
-          Alert.alert('Backtest Failed', status.error || 'Unknown error');
-          clearInterval(poll);
-        }
-      } catch { clearInterval(poll); }
-    }, 3000);
-    return () => clearInterval(poll);
-  }, [jobId, running, loadResults]);
-
-  const runBacktest = async () => {
-    const syms = symbols.split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
-    if (syms.length === 0) { Alert.alert('Error', 'Enter at least one symbol.'); return; }
-    setRunning(true);
-    setError(null);
-    try {
-      const resp = await apiPost<{ job_id: string }>('/api/backtest/run', {
-        symbols: syms, start_date: startDate, end_date: endDate,
-        initial_capital: parseFloat(capital) || 100000,
-      });
-      setJobId(resp.job_id);
-    } catch (e: any) {
-      setRunning(false);
-      Alert.alert('Error', e.message);
-    }
-  };
+  const handleAnalyze = () => analyze(symbol);
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scroll}>
-        <Text style={styles.headerTitle}>Backtest</Text>
+      <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
+        {/* Header */}
+        <Text style={styles.headerTitle}>Analysis</Text>
 
-        {/* Config form */}
-        <View style={styles.card}>
-          <Text style={styles.sectionTitle}>Configuration</Text>
+        {/* Search section */}
+        <View style={styles.searchCard}>
+          <TextInput
+            style={styles.searchInput}
+            value={symbol}
+            onChangeText={setSymbol}
+            autoCapitalize="characters"
+            placeholder="Enter symbol (e.g. AAPL, BTC-USD)"
+            placeholderTextColor={Colors.textMuted}
+            returnKeyType="search"
+            onSubmitEditing={handleAnalyze}
+          />
+          <TouchableOpacity
+            style={[styles.analyzeBtn, loading && { opacity: 0.7 }]}
+            onPress={handleAnalyze}
+            disabled={loading}
+          >
+            <Text style={styles.analyzeBtnText}>Analyze</Text>
+          </TouchableOpacity>
 
-          <Text style={styles.label}>Symbols (comma-separated)</Text>
-          <TextInput style={styles.input} value={symbols} onChangeText={setSymbols} autoCapitalize="characters" placeholder="AAPL,MSFT,NVDA" placeholderTextColor={Colors.textMuted} />
-
-          {/* Presets */}
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.presetScroll}>
-            {PRESET_SYMBOLS.map(p => (
-              <TouchableOpacity key={p} style={[styles.preset, symbols === p && styles.presetActive]} onPress={() => setSymbols(p)}>
-                <Text style={[styles.presetText, symbols === p && styles.presetTextActive]}>{p}</Text>
+          {/* Quick symbol chips */}
+          <View style={styles.chipsRow}>
+            {QUICK_SYMBOLS.map(s => (
+              <TouchableOpacity
+                key={s}
+                style={[styles.chip, symbol === s && styles.chipActive]}
+                onPress={() => analyze(s)}
+              >
+                <Text style={[styles.chipText, symbol === s && styles.chipTextActive]}>{s}</Text>
               </TouchableOpacity>
             ))}
-          </ScrollView>
-
-          <View style={styles.dateRow}>
-            <View style={styles.dateField}>
-              <Text style={styles.label}>Start Date</Text>
-              <TextInput style={styles.input} value={startDate} onChangeText={setStartDate} placeholder="YYYY-MM-DD" placeholderTextColor={Colors.textMuted} />
-            </View>
-            <View style={{ width: 12 }} />
-            <View style={styles.dateField}>
-              <Text style={styles.label}>End Date</Text>
-              <TextInput style={styles.input} value={endDate} onChangeText={setEndDate} placeholder="YYYY-MM-DD" placeholderTextColor={Colors.textMuted} />
-            </View>
           </View>
-
-          <Text style={styles.label}>Initial Capital ($)</Text>
-          <TextInput style={styles.input} value={capital} onChangeText={setCapital} keyboardType="numeric" placeholder="100000" placeholderTextColor={Colors.textMuted} />
-
-          <TouchableOpacity style={[styles.runButton, running && styles.runButtonDisabled]} onPress={runBacktest} disabled={running}>
-            {running
-              ? <><ActivityIndicator color="#fff" size="small" /><Text style={styles.runButtonText}> Running…</Text></>
-              : <Text style={styles.runButtonText}>▶ Run Backtest</Text>}
-          </TouchableOpacity>
         </View>
 
+        {/* Loading state */}
+        {loading && (
+          <View style={styles.center}>
+            <ActivityIndicator size="large" color={Colors.primary} />
+            <Text style={styles.loadingText}>Analyzing {symbol}...</Text>
+          </View>
+        )}
+
+        {/* Error state */}
+        {error && !loading && (
+          <View style={styles.errorBanner}>
+            <Text style={styles.errorText}>Could not load analysis: {error}</Text>
+          </View>
+        )}
+
+        {/* Empty state */}
+        {!loading && !error && !result && (
+          <View style={styles.emptyState}>
+            <Text style={styles.emptyText}>
+              Enter a stock symbol above to get a full multi-agent analysis
+            </Text>
+            <View style={styles.chipsRow}>
+              {QUICK_SYMBOLS.map(s => (
+                <TouchableOpacity
+                  key={s}
+                  style={styles.chip}
+                  onPress={() => analyze(s)}
+                >
+                  <Text style={styles.chipText}>{s}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        )}
+
         {/* Results */}
-        <Text style={styles.sectionTitle}>Past Results</Text>
-        {loadingResults
-          ? <ActivityIndicator color={Colors.primary} />
-          : results.length === 0
-            ? <Text style={styles.emptyText}>No completed backtests yet.</Text>
-            : results.map(r => <ResultCard key={r.id} result={r} />)}
+        {result && !loading && (
+          <>
+            {/* Summary card */}
+            <View style={styles.summaryCard}>
+              <View style={styles.summaryTop}>
+                <View>
+                  <Text style={styles.summarySymbol}>{result.symbol}</Text>
+                  <View style={styles.summaryPriceRow}>
+                    <Text style={styles.summaryPrice}>${result.price?.toFixed(2)}</Text>
+                    {result.change_pct != null && (
+                      <Text style={[styles.summaryChange, { color: result.change_pct >= 0 ? Colors.green : Colors.red }]}>
+                        {result.change_pct >= 0 ? '+' : ''}{result.change_pct.toFixed(2)}%
+                      </Text>
+                    )}
+                  </View>
+                </View>
+              </View>
+              <View style={styles.summaryMeta}>
+                <RecoBadge label={result.recommendation} />
+                <Text style={styles.summaryMetaText}>
+                  Confidence: <Text style={styles.summaryMetaValue}>{((result.confidence ?? 0) * 100).toFixed(0)}%</Text>
+                </Text>
+                <Text style={styles.summaryMetaText}>
+                  Agreement: <Text style={styles.summaryMetaValue}>{result.agreement_pct?.toFixed(0) ?? '—'}%</Text>
+                </Text>
+              </View>
+            </View>
+
+            {/* Agent Breakdown */}
+            {result.votes && result.votes.length > 0 && (
+              <>
+                <Text style={styles.sectionTitle}>Agent Breakdown</Text>
+                {result.votes.map((vote, i) => (
+                  <AgentCard key={i} vote={vote} />
+                ))}
+              </>
+            )}
+
+            {/* Debate */}
+            {((result.key_reasons && result.key_reasons.length > 0) ||
+              (result.key_risks && result.key_risks.length > 0)) && (
+              <>
+                <Text style={styles.sectionTitle}>Debate</Text>
+                <View style={styles.debateCard}>
+                  {result.key_reasons && result.key_reasons.length > 0 && (
+                    <View style={styles.caseSection}>
+                      <Text style={styles.caseSectionTitle}>🐂 Bull Case</Text>
+                      {result.key_reasons.map((r, i) => (
+                        <Text key={i} style={styles.bulletText}>• {r}</Text>
+                      ))}
+                    </View>
+                  )}
+                  {result.key_risks && result.key_risks.length > 0 && (
+                    <View style={[styles.caseSection, result.key_reasons && result.key_reasons.length > 0 && styles.caseDivider]}>
+                      <Text style={styles.caseSectionTitle}>🐻 Bear Case</Text>
+                      {result.key_risks.map((r, i) => (
+                        <Text key={i} style={styles.bulletText}>• {r}</Text>
+                      ))}
+                    </View>
+                  )}
+                </View>
+              </>
+            )}
+          </>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -189,28 +273,144 @@ export default function BacktestScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
   scroll: { padding: 16, paddingBottom: 40 },
+
   headerTitle: { fontSize: 26, fontWeight: 'bold', color: Colors.text, marginBottom: 16 },
-  card: { backgroundColor: Colors.surface, borderRadius: 16, padding: 16, marginBottom: 20, borderWidth: 1, borderColor: Colors.border },
-  sectionTitle: { fontSize: 13, fontWeight: '700', color: Colors.textSecondary, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 14 },
-  label: { fontSize: 12, color: Colors.textSecondary, marginBottom: 6, marginTop: 10 },
-  input: { backgroundColor: Colors.surfaceAlt, borderWidth: 1, borderColor: Colors.border, borderRadius: 10, height: 44, paddingHorizontal: 12, color: Colors.text, fontSize: 14 },
-  presetScroll: { marginTop: 8, marginBottom: 4 },
-  preset: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, backgroundColor: Colors.surfaceAlt, borderWidth: 1, borderColor: Colors.border, marginRight: 8 },
-  presetActive: { backgroundColor: Colors.primary, borderColor: Colors.primary },
-  presetText: { fontSize: 12, color: Colors.textSecondary },
-  presetTextActive: { color: '#fff', fontWeight: '600' },
-  dateRow: { flexDirection: 'row' },
-  dateField: { flex: 1 },
-  runButton: { backgroundColor: Colors.primary, borderRadius: 12, height: 50, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', marginTop: 20 },
-  runButtonDisabled: { opacity: 0.6 },
-  runButtonText: { color: '#fff', fontSize: 16, fontWeight: '700' },
-  resultCard: { backgroundColor: Colors.surface, borderRadius: 14, padding: 16, marginBottom: 10, borderWidth: 1, borderColor: Colors.border },
-  resultHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 },
-  resultSymbols: { fontSize: 15, fontWeight: '700', color: Colors.text },
-  resultDate: { fontSize: 11, color: Colors.textSecondary },
-  resultGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  resultMetric: { width: '30%', backgroundColor: Colors.surfaceAlt, borderRadius: 8, padding: 10, alignItems: 'center' },
-  metricValue: { fontSize: 16, fontWeight: '700', color: Colors.text },
-  metricLabel: { fontSize: 10, color: Colors.textSecondary, marginTop: 3, textTransform: 'uppercase' },
-  emptyText: { color: Colors.textSecondary, textAlign: 'center', paddingTop: 20 },
+
+  searchCard: {
+    backgroundColor: Colors.surface,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  searchInput: {
+    backgroundColor: Colors.surfaceAlt,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: 10,
+    height: 46,
+    paddingHorizontal: 14,
+    color: Colors.text,
+    fontSize: 15,
+    marginBottom: 10,
+  },
+  analyzeBtn: {
+    backgroundColor: Colors.primary,
+    borderRadius: 10,
+    height: 46,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 14,
+  },
+  analyzeBtnText: { color: '#fff', fontWeight: '700', fontSize: 15 },
+  chipsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  chip: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    backgroundColor: Colors.surfaceAlt,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  chipActive: { backgroundColor: Colors.primary, borderColor: Colors.primary },
+  chipText: { fontSize: 12, color: Colors.textSecondary, fontWeight: '600' },
+  chipTextActive: { color: '#fff' },
+
+  center: { alignItems: 'center', paddingVertical: 40 },
+  loadingText: { color: Colors.textSecondary, marginTop: 12 },
+
+  errorBanner: {
+    backgroundColor: '#3D1010',
+    borderRadius: 10,
+    padding: 14,
+    marginBottom: 16,
+  },
+  errorText: { color: Colors.red, fontSize: 13 },
+
+  emptyState: { alignItems: 'center', paddingVertical: 40 },
+  emptyText: {
+    color: Colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 22,
+    fontSize: 14,
+    marginBottom: 20,
+  },
+
+  summaryCard: {
+    backgroundColor: Colors.surface,
+    borderRadius: 14,
+    padding: 16,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  summaryTop: { marginBottom: 12 },
+  summarySymbol: { fontSize: 22, fontWeight: '900', color: Colors.text },
+  summaryPriceRow: { flexDirection: 'row', alignItems: 'baseline', gap: 8, marginTop: 4 },
+  summaryPrice: { fontSize: 18, fontWeight: '700', color: Colors.text },
+  summaryChange: { fontSize: 14, fontWeight: '600' },
+  summaryMeta: { flexDirection: 'row', alignItems: 'center', gap: 10, flexWrap: 'wrap' },
+  summaryMetaText: { fontSize: 13, color: Colors.textSecondary },
+  summaryMetaValue: { color: Colors.text, fontWeight: '600' },
+
+  sectionTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: Colors.textSecondary,
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
+    marginBottom: 10,
+  },
+
+  agentCard: {
+    backgroundColor: Colors.surface,
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  agentCardTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: Colors.text,
+    marginBottom: 10,
+  },
+  agentScoreRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 8,
+  },
+  scoreBarBg: {
+    height: 6,
+    backgroundColor: Colors.border,
+    borderRadius: 3,
+    overflow: 'hidden',
+  },
+  scoreBarFill: { height: 6, borderRadius: 3 },
+  agentScoreValue: { fontSize: 13, fontWeight: '700', width: 42, textAlign: 'right' },
+  reasonsList: { marginTop: 4 },
+  bulletText: { fontSize: 12, color: Colors.textSecondary, lineHeight: 18, marginBottom: 3 },
+
+  badge: { borderRadius: 4, paddingHorizontal: 8, paddingVertical: 3, borderWidth: 1 },
+  badgeText: { fontSize: 11, fontWeight: '700', letterSpacing: 0.5 },
+
+  debateCard: {
+    backgroundColor: Colors.surface,
+    borderRadius: 14,
+    padding: 16,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  caseSection: {},
+  caseDivider: {
+    marginTop: 14,
+    paddingTop: 14,
+    borderTopWidth: 1,
+    borderTopColor: Colors.border,
+  },
+  caseSectionTitle: { fontSize: 14, fontWeight: '700', color: Colors.text, marginBottom: 8 },
 });
