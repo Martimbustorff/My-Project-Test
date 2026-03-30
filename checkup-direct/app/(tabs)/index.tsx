@@ -78,24 +78,29 @@ function RecoBadge({ rec }: { rec?: string }) {
 }
 
 // Position Card
-function PositionCard({ item, onLongPress }: { item: Position; onLongPress: () => void }) {
+function PositionCard({ item, onDelete }: { item: Position; onDelete: () => void }) {
   const pnl = item.pnl ?? 0;
   const pnlPct = item.pnl_pct ?? 0;
   const hasPnl = item.pnl !== null;
 
   return (
-    <TouchableOpacity style={styles.posCard} onLongPress={onLongPress} activeOpacity={0.85}>
-      {/* Row 1: direction badge + symbol | P&L $ */}
+    <View style={styles.posCard}>
+      {/* Row 1: direction badge + symbol | P&L $ | ✕ button */}
       <View style={styles.posRow1}>
         <View style={styles.posRow1Left}>
           <DirectionBadge direction={item.direction} />
           <Text style={styles.posSymbol}>{item.symbol}</Text>
         </View>
-        {hasPnl && (
-          <Text style={[styles.posPnlDollar, { color: pnlColor(pnl) }]}>
-            {pnl >= 0 ? '+' : '-'}{fmt$(pnl)}
-          </Text>
-        )}
+        <View style={styles.posRow1Right}>
+          {hasPnl && (
+            <Text style={[styles.posPnlDollar, { color: pnlColor(pnl) }]}>
+              {pnl >= 0 ? '+' : '-'}{fmt$(pnl)}
+            </Text>
+          )}
+          <TouchableOpacity style={styles.deleteBtn} onPress={onDelete} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+            <Text style={styles.deleteBtnText}>✕</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Row 2: Qty | Avg | Now */}
@@ -118,7 +123,7 @@ function PositionCard({ item, onLongPress }: { item: Position; onLongPress: () =
         )}
         {item.recommendation && <RecoBadge rec={item.recommendation} />}
       </View>
-    </TouchableOpacity>
+    </View>
   );
 }
 
@@ -353,7 +358,7 @@ export default function PortfolioScreen() {
           </View>
         }
         renderItem={({ item }) => (
-          <PositionCard item={item} onLongPress={() => handleDelete(item)} />
+          <PositionCard item={item} onDelete={() => handleDelete(item)} />
         )}
       />
 
@@ -418,8 +423,20 @@ const styles = StyleSheet.create({
   },
   posRow1: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
   posRow1Left: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  posRow1Right: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   posSymbol: { fontSize: 18, fontWeight: '800', color: Colors.text },
   posPnlDollar: { fontSize: 16, fontWeight: '700' },
+  deleteBtn: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#3D1010',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: Colors.red,
+  },
+  deleteBtnText: { color: Colors.red, fontSize: 13, fontWeight: '700', lineHeight: 16 },
 
   posRow2: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8 },
   posMetaText: { fontSize: 13, color: Colors.textSecondary },
