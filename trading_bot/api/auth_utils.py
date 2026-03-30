@@ -1,38 +1,73 @@
-"""JWT auth utilities."""
+"""JWT auth utilities — pure stdlib implementation (no PyJWT dependency)."""
 import os
+import base64
 import hashlib
 import hmac
-from datetime import datetime, timedelta
+import json
+from datetime import datetime, timedelta, timezone
 from typing import Optional
-import jwt  # PyJWT
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 SECRET_KEY = os.environ.get("JWT_SECRET", "changeme-use-a-long-random-secret-in-production")
-ALGORITHM  = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 24 hours
 
 security = HTTPBearer()
 
+
+def _b64url_encode(data: bytes) -> str:
+    return base64.urlsafe_b64encode(data).rstrip(b"=").decode()
+
+
+def _b64url_decode(s: str) -> bytes:
+    pad = 4 - len(s) % 4
+    return base64.urlsafe_b64decode(s + "=" * (pad % 4))
+
+
 def hash_password(password: str) -> str:
     return hashlib.sha256(password.encode()).hexdigest()
+
 
 def verify_password(password: str, hashed: str) -> bool:
     return hmac.compare_digest(hash_password(password), hashed)
 
+
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
-    to_encode = data.copy()
-    expire = datetime.utcnow() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
-    to_encode["exp"] = expire
-    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    payload = data.copy()
+    expire = datetime.now(timezone.utc) + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
+    payload["exp"] = int(expire.timestamp())
+
+    header  = _b64url_encode(json.dumps({"alg": "HS256", "typ": "JWT"}).encode())
+    body    = _b64url_encode(json.dumps(payload).encode())
+    signing = f"{header}.{body}".encode()
+    sig     = _b64url_encode(hmac.new(SECRET_KEY.encode(), signing, hashlib.sha256).digest())
+    return f"{header}.{body}.{sig}"
+
 
 def decode_token(token: str) -> dict:
     try:
-        return jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-    except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=401, detail="Token expired")
-    except jwt.InvalidTokenError:
+        parts = token.split(".")
+        if len(parts) != 3:
+            raise ValueError("Malformed token")
+
+        header_b, body_b, sig_b = parts
+        signing  = f"{header_b}.{body_b}".encode()
+        expected = _b64url_encode(hmac.new(SECRET_KEY.encode(), signing, hashlib.sha256).digest())
+
+        if not hmac.compare_digest(expected, sig_b):
+            raise HTTPException(status_code=401, detail="Invalid token")
+
+        payload = json.loads(_b64url_decode(body_b))
+
+        if "exp" in payload and payload["exp"] < datetime.now(timezone.utc).timestamp():
+            raise HTTPException(status_code=401, detail="Token expired")
+
+        return payload
+    except HTTPException:
+        raise
+    except Exception:
         raise HTTPException(status_code=401, detail="Invalid token")
+
 
 def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> dict:
     return decode_token(credentials.credentials)
