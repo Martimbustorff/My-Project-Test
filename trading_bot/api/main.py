@@ -8,10 +8,17 @@ Run with:
     cd trading_bot
     uvicorn api.main:app --reload --port 8000
 """
+# Load .env file if present (keys: ANTHROPIC_API_KEY, FINNHUB_API_KEY, FRED_API_KEY)
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from api.routes import auth, portfolio, signals, trades, bot, backtest
-from api.routes import portfolio_positions, watchlist, scanner, analysis_route
+from api.routes import portfolio_positions, watchlist, scanner, analysis_route, insights
 from api.database import init_db
 
 app = FastAPI(title="Trading Bot API", version="1.0.0")
@@ -47,6 +54,7 @@ app.include_router(portfolio_positions.router, prefix="/api/positions", tags=["p
 app.include_router(watchlist.router,          prefix="/api/watchlist", tags=["watchlist"])
 app.include_router(scanner.router,            prefix="/api/scanner",   tags=["scanner"])
 app.include_router(analysis_route.router,     prefix="/api/analysis",  tags=["analysis"])
+app.include_router(insights.router,           prefix="/api/insights",  tags=["insights"])
 
 @app.get("/api/health")
 def health():

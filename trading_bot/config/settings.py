@@ -39,6 +39,16 @@ class Settings:
     NEWS_API_KEY: str = os.environ.get("NEWS_API_KEY", "")
 
     # ---------------------------------------------------------------------------
+    # Claude / Anthropic API (for debate engine)
+    # ---------------------------------------------------------------------------
+    ANTHROPIC_API_KEY: str = os.environ.get("ANTHROPIC_API_KEY", "")
+
+    # ---------------------------------------------------------------------------
+    # Finnhub API (for real news sentiment)
+    # ---------------------------------------------------------------------------
+    FINNHUB_API_KEY: str = os.environ.get("FINNHUB_API_KEY", "")
+
+    # ---------------------------------------------------------------------------
     # General trading mode
     # ---------------------------------------------------------------------------
     TRADING_MODE: str = os.environ.get("TRADING_MODE", "paper")  # "paper" or "live"

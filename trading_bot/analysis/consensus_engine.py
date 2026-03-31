@@ -114,6 +114,8 @@ class ConsensusResult:
     key_reasons: List[str]   # top 3 consensus reasons
     key_risks: List[str]     # top 2 opposing reasons
 
+    debate_result: Optional[dict] = None  # Claude debate engine output (if API key set)
+
     def to_dict(self) -> dict:
         d = asdict(self)
         return d
@@ -631,7 +633,34 @@ def momentum_agent(ticker: yf.Ticker, hist: pd.DataFrame, spy_hist: pd.DataFrame
 def sentiment_agent(ticker: yf.Ticker, hist: pd.DataFrame) -> AgentVote:
     """
     Sentiment agent using yfinance ticker.news and keyword scoring.
+    Prefers Finnhub pre-computed sentiment when FINNHUB_API_KEY is set.
     """
+    # Extract symbol from ticker for Finnhub lookup
+    _symbol = getattr(ticker, "ticker", None) or ""
+
+    # Try Finnhub first (more reliable)
+    try:
+        from data.finnhub_client import get_news_sentiment
+        fh = get_news_sentiment(_symbol)
+        if fh is not None:
+            final_score = fh["score"]
+            confidence = 0.75 + (fh["buzz_ratio"] - 1.0) * 0.05  # Higher confidence with more articles
+            confidence = max(0.4, min(0.95, confidence))
+            reasons = fh["reasons"]
+            # Return early with Finnhub data
+            signal = ConsensusResult.score_to_signal(final_score)
+            return AgentVote(
+                agent_name="Sentiment",
+                score=final_score,
+                confidence=confidence,
+                signal=signal,
+                reasons=reasons,
+                weight=ConsensusEngine.AGENT_WEIGHTS.get("Sentiment", 0.15),
+            )
+    except Exception:
+        pass
+    # Fall through to existing keyword-based analysis...
+
     BULLISH_KEYWORDS = {
         "beat", "beats", "growth", "record", "profit", "upgrade", "upgraded",
         "buy", "strong", "surge", "surges", "raised", "raise", "expansion",
@@ -756,15 +785,62 @@ def sentiment_agent(ticker: yf.Ticker, hist: pd.DataFrame) -> AgentVote:
 
 
 # ---------------------------------------------------------------------------
+# Macro Agent (FRED + regime detection)
+# ---------------------------------------------------------------------------
+
+def macro_agent(symbol: str) -> AgentVote:
+    """
+    Agent 5: Macro/Regime — uses FRED economic data to assess whether the
+    current macro environment favours longs or shorts.
+    Score is the same for all stocks but adjusted by symbol type (crypto vs equity).
+    """
+    try:
+        from data.macro_data import get_macro_regime
+        regime = get_macro_regime()
+
+        score = regime["score_adjustment"]
+        reasons = regime["reasons"] or [f"Macro regime: {regime['regime']}"]
+
+        # Crypto is more sensitive to risk-off — amplify the signal
+        if "-USD" in symbol:
+            score *= 1.5
+            score = max(-1.0, min(1.0, score))
+            reasons = [f"[Crypto] {r}" for r in reasons]
+
+        # Confidence: higher when regime is clear
+        confidence = 0.6 if regime["regime"] == "neutral" else 0.75
+
+        signal = ConsensusResult.score_to_signal(score)
+        return AgentVote(
+            agent_name="Macro",
+            score=round(score, 3),
+            confidence=confidence,
+            signal=signal,
+            reasons=reasons[:3] or [f"Macro regime: {regime['regime']}"],
+        )
+
+    except Exception as e:
+        logger.debug("Macro agent failed: %s", e)
+        return AgentVote(
+            agent_name="Macro",
+            score=0.0,
+            confidence=0.3,
+            signal="HOLD",
+            reasons=["Macro data unavailable — FRED fetch failed"],
+        )
+
+
+# ---------------------------------------------------------------------------
 # ConsensusEngine
 # ---------------------------------------------------------------------------
 
 class ConsensusEngine:
     AGENT_WEIGHTS = {
-        "Technical": 0.35,
-        "Fundamental": 0.25,
-        "Momentum": 0.25,
-        "Sentiment": 0.15,
+        "Technical":   0.30,
+        "Fundamental": 0.20,
+        "Momentum":    0.20,
+        "Sentiment":   0.15,
+        "Macro":       0.15,   # NEW: macro/regime agent
     }
 
     def analyze(self, symbol: str) -> Optional[ConsensusResult]:
@@ -794,13 +870,14 @@ class ConsensusEngine:
             # Run agents in parallel
             votes: List[AgentVote] = []
             agent_fns = {
-                "Technical": lambda: technical_agent(ticker, hist),
+                "Technical":   lambda: technical_agent(ticker, hist),
                 "Fundamental": lambda: fundamental_agent(ticker, hist),
-                "Momentum": lambda: momentum_agent(ticker, hist, spy),
-                "Sentiment": lambda: sentiment_agent(ticker, hist),
+                "Momentum":    lambda: momentum_agent(ticker, hist, spy),
+                "Sentiment":   lambda: sentiment_agent(ticker, hist),
+                "Macro":       lambda: macro_agent(symbol),
             }
 
-            with ThreadPoolExecutor(max_workers=4) as executor:
+            with ThreadPoolExecutor(max_workers=5) as executor:
                 futures = {executor.submit(fn): name for name, fn in agent_fns.items()}
                 for future in as_completed(futures):
                     name = futures[future]
@@ -860,6 +937,30 @@ class ConsensusEngine:
                         if len(key_risks) >= 2:
                             break
 
+            # Run Claude debate engine if API key available
+            debate_result = None
+            try:
+                from analysis.debate_engine import run_debate
+                debate_result = run_debate(
+                    symbol=symbol,
+                    price=price,
+                    change_pct=change_pct,
+                    votes=votes,
+                    consensus_score=consensus_score,
+                    recommendation=recommendation,
+                )
+                if debate_result:
+                    # Override recommendation and confidence with Claude's verdict
+                    recommendation = debate_result["final_recommendation"]
+                    direction = debate_result["direction"]
+                    confidence = debate_result["confidence"]
+                    # Use Claude's reasoning as key_reasons
+                    key_reasons = debate_result["reasoning"][:3]
+                    key_risks = [debate_result["key_risk"]]
+            except Exception as e:
+                logger.debug("Debate engine skipped: %s", e)
+                debate_result = None
+
             result = ConsensusResult(
                 symbol=symbol,
                 timestamp=datetime.now(tz=timezone.utc).isoformat(),
@@ -875,6 +976,7 @@ class ConsensusEngine:
                 bear_agents=bear_agents,
                 key_reasons=key_reasons[:3],
                 key_risks=key_risks[:2],
+                debate_result=debate_result,
             )
 
             self.save_to_cache(result)
