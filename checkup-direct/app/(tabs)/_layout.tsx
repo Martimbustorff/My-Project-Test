@@ -133,6 +133,8 @@ const styles = StyleSheet.create({
   },
   desktopContent: {
     flex: 1,
+    // Compensate for fixed-position sidebar on web
+    ...(Platform.OS === 'web' ? { marginLeft: 200 } : {}),
   },
 
   // Sidebar

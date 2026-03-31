@@ -16,30 +16,41 @@ logger = logging.getLogger(__name__)
 DB_PATH = os.environ.get("DB_PATH", "trading_bot.db")
 
 SCAN_UNIVERSE = [
-    # Mega caps
+    # ── Mega caps ────────────────────────────────────────────────────────────
     "AAPL", "MSFT", "NVDA", "GOOGL", "AMZN", "META", "TSLA", "AVGO", "BRK-B",
-    # Financials
-    "JPM", "V", "MA", "GS", "MS", "BAC", "AXP", "BLK",
-    # Healthcare
+    # ── High-growth tech ─────────────────────────────────────────────────────
+    "AMD", "ADBE", "CRM", "NOW", "SNOW", "PLTR", "SHOP", "NET", "DDOG",
+    "ZS", "CRWD", "PANW", "MDB", "GTLB", "HUBS", "ZM", "OKTA", "BILL",
+    # ── Semis / hardware ─────────────────────────────────────────────────────
+    "INTC", "QCOM", "TXN", "MU", "AMAT", "LRCX", "KLAC", "MRVL", "ON",
+    "TSM", "ASML", "SMCI", "WOLF", "SWKS",
+    # ── Legacy tech / infra ──────────────────────────────────────────────────
+    "ORCL", "IBM", "CSCO", "HPE", "DELL", "ACN", "INFY",
+    # ── Financials ───────────────────────────────────────────────────────────
+    "JPM", "V", "MA", "GS", "MS", "BAC", "WFC", "AXP", "BLK", "SCHW",
+    "COF", "SQ", "PYPL", "NU", "SOFI",
+    # ── Healthcare / biotech ─────────────────────────────────────────────────
     "UNH", "LLY", "JNJ", "ABBV", "MRK", "TMO", "DHR", "AMGN", "GILD",
-    # Consumer
-    "WMT", "HD", "MCD", "NKE", "SBUX", "COST", "PG", "KO", "PEP", "PM", "MO",
-    # Energy
-    "XOM", "CVX", "COP", "SLB",
-    # Industrials
-    "CAT", "DE", "HON", "UNP", "BA", "RTX", "LMT",
-    # Tech
-    "AMD", "INTC", "QCOM", "TXN", "ADBE", "CRM", "ORCL", "IBM", "CSCO", "NFLOX",
-    # Semis
-    "TSM", "ASML", "MU", "AMAT",
-    # ETFs
-    "SPY", "QQQ", "IWM", "GLD",
-    # Crypto (via yfinance)
-    "BTC-USD", "ETH-USD", "SOL-USD",
+    "REGN", "VRTX", "MRNA", "BIIB", "ISRG", "BSX", "SYK", "ELV", "HUM",
+    # ── Consumer discretionary ───────────────────────────────────────────────
+    "WMT", "COST", "HD", "TGT", "MCD", "SBUX", "NKE", "LULU", "ROST",
+    "TJX", "AMZN", "BKNG", "ABNB", "MAR", "HLT",
+    # ── Consumer staples ─────────────────────────────────────────────────────
+    "PG", "KO", "PEP", "PM", "MO", "MDLZ", "CL", "EL",
+    # ── Energy ───────────────────────────────────────────────────────────────
+    "XOM", "CVX", "COP", "SLB", "MPC", "PSX", "VLO", "EOG", "PXD",
+    # ── Industrials / defence ────────────────────────────────────────────────
+    "CAT", "DE", "HON", "UNP", "BA", "RTX", "LMT", "GE", "MMM", "FDX",
+    # ── Media / entertainment ────────────────────────────────────────────────
+    "NFLX", "DIS", "CMCSA", "T", "VZ", "CHTR", "PARA",
+    # ── Real estate / utilities ──────────────────────────────────────────────
+    "NEE", "DUK", "AMT", "PLD", "EQIX",
+    # ── Sector / thematic ETFs ───────────────────────────────────────────────
+    "SPY", "QQQ", "IWM", "DIA", "GLD", "SLV", "TLT", "XLK", "XLF",
+    "XLE", "XLV", "XLY", "ARKK", "SOXX",
+    # ── Crypto ───────────────────────────────────────────────────────────────
+    "BTC-USD", "ETH-USD", "SOL-USD", "LINK-USD", "AVAX-USD",
 ]
-
-# Fix typo
-SCAN_UNIVERSE = [s.replace("NFLOX", "NFLX") for s in SCAN_UNIVERSE]
 
 
 class MarketScanner:
@@ -80,18 +91,18 @@ class MarketScanner:
                     results.append(res)
 
         # Sort into longs and shorts
-        # Only show clear BUY/STRONG BUY for longs (not HOLDs)
+        # BUY / STRONG BUY first, then near-signals (score >= 0.10) as "WATCH"
         top_longs = sorted(
-            [r for r in results if r.recommendation in ("BUY", "STRONG BUY") and r.consensus_score > 0],
+            [r for r in results if r.consensus_score >= 0.10],
             key=lambda r: r.consensus_score,
             reverse=True,
-        )[:15]
+        )[:20]
 
-        # Only show clear SELL/STRONG SELL for shorts
+        # SELL / STRONG SELL first, then near-shorts (score <= -0.10)
         top_shorts = sorted(
-            [r for r in results if r.recommendation in ("SELL", "STRONG SELL") and r.consensus_score < 0],
+            [r for r in results if r.consensus_score <= -0.10],
             key=lambda r: r.consensus_score,
-        )[:8]
+        )[:12]
 
         def _summary(r) -> dict:
             agents_agree = len(r.bull_agents) if r.consensus_score >= 0 else len(r.bear_agents)
