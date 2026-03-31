@@ -19,6 +19,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from api.routes import auth, portfolio, signals, trades, bot, backtest
 from api.routes import portfolio_positions, watchlist, scanner, analysis_route, insights
+from api.routes import research
 from api.database import init_db
 
 app = FastAPI(title="Trading Bot API", version="1.0.0")
@@ -55,6 +56,7 @@ app.include_router(watchlist.router,          prefix="/api/watchlist", tags=["wa
 app.include_router(scanner.router,            prefix="/api/scanner",   tags=["scanner"])
 app.include_router(analysis_route.router,     prefix="/api/analysis",  tags=["analysis"])
 app.include_router(insights.router,           prefix="/api/insights",  tags=["insights"])
+app.include_router(research.router,           prefix="/api/research",  tags=["research"])
 
 @app.get("/api/health")
 def health():
