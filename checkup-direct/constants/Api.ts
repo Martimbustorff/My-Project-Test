@@ -35,3 +35,14 @@ export async function apiPost<T>(path: string, body: unknown): Promise<T> {
   }
   return res.json();
 }
+
+export async function apiDelete<T>(path: string): Promise<T> {
+  const headers = await getAuthHeaders();
+  const res = await fetch(`${API_BASE_URL}${path}`, { method: 'DELETE', headers });
+  if (res.status === 401) throw new Error('UNAUTHORIZED');
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || `API error ${res.status}`);
+  }
+  return res.json().catch(() => ({} as T));
+}

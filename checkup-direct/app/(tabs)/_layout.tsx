@@ -9,6 +9,7 @@ const NAV_ITEMS = [
   { route: '/trades',    label: 'Scanner',   emoji: '🔭' },
   { route: '/signals',   label: 'Signals',   emoji: '⚡' },
   { route: '/backtest',  label: 'Analysis',  emoji: '🔬' },
+  { route: '/explore',   label: 'Market',    emoji: '🌍' },
   { route: '/settings',  label: 'Settings',  emoji: '⚙️' },
 ];
 
@@ -88,8 +89,8 @@ export default function TabLayout() {
             <Tabs.Screen name="trades"   options={{ title: 'Scanner' }} />
             <Tabs.Screen name="signals"  options={{ title: 'Signals' }} />
             <Tabs.Screen name="backtest" options={{ title: 'Analysis' }} />
+            <Tabs.Screen name="explore"  options={{ title: 'Market' }} />
             <Tabs.Screen name="settings" options={{ title: 'Settings' }} />
-            <Tabs.Screen name="explore"  options={{ href: null }} />
           </Tabs>
         </View>
       </View>
@@ -117,8 +118,8 @@ export default function TabLayout() {
       <Tabs.Screen name="trades"   options={{ title: 'Scanner',   tabBarIcon: ({ color }) => <TabBarEmoji emoji="🔭" color={color} /> }} />
       <Tabs.Screen name="signals"  options={{ title: 'Signals',   tabBarIcon: ({ color }) => <TabBarEmoji emoji="⚡" color={color} /> }} />
       <Tabs.Screen name="backtest" options={{ title: 'Analysis',  tabBarIcon: ({ color }) => <TabBarEmoji emoji="🔬" color={color} /> }} />
+      <Tabs.Screen name="explore"  options={{ title: 'Market',    tabBarIcon: ({ color }) => <TabBarEmoji emoji="🌍" color={color} /> }} />
       <Tabs.Screen name="settings" options={{ title: 'Settings',  tabBarIcon: ({ color }) => <TabBarEmoji emoji="⚙️" color={color} /> }} />
-      <Tabs.Screen name="explore"  options={{ href: null }} />
     </Tabs>
   );
 }

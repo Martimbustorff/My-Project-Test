@@ -6,6 +6,7 @@ import { useEffect, useState, useCallback } from 'react';
 import 'react-native-reanimated';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AuthContext, performLogin, performSignup, performLogout } from '@/hooks/useAuth';
+import { ToastProvider } from '@/components/Toast';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -53,12 +54,14 @@ export default function RootLayout() {
   return (
     <AuthContext.Provider value={{ isAuthenticated: !!token, token, login, signup, logout }}>
       <ThemeProvider value={DarkTheme}>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="login" options={{ headerShown: false }} />
-          <Stack.Screen name="signup" options={{ headerShown: false }} />
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="+not-found" />
-        </Stack>
+        <ToastProvider>
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="login" options={{ headerShown: false }} />
+            <Stack.Screen name="signup" options={{ headerShown: false }} />
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="+not-found" />
+          </Stack>
+        </ToastProvider>
       </ThemeProvider>
     </AuthContext.Provider>
   );
