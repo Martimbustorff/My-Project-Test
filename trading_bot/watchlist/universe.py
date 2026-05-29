@@ -74,12 +74,40 @@ _US: list[Candidate] = [
     Candidate("TTD",   "The Trade Desk",          "US", "Nasdaq"),
     Candidate("DKNG",  "DraftKings",              "US", "Nasdaq"),
     Candidate("RBLX",  "Roblox",                  "US", "NYSE"),
+    # Semiconductors / hardware
+    Candidate("ARM",   "Arm Holdings",            "US", "Nasdaq"),
+    Candidate("MU",    "Micron Technology",       "US", "Nasdaq"),
+    Candidate("LRCX",  "Lam Research",            "US", "Nasdaq"),
+    Candidate("KLAC",  "KLA Corporation",         "US", "Nasdaq"),
+    Candidate("ANET",  "Arista Networks",         "US", "NYSE"),
+    Candidate("SMCI",  "Super Micro Computer",    "US", "Nasdaq"),
+    Candidate("VRT",   "Vertiv Holdings",         "US", "NYSE"),
+    Candidate("CRDO",  "Credo Technology",        "US", "Nasdaq"),
+    # Software / internet
+    Candidate("APP",   "AppLovin",                "US", "Nasdaq"),
+    Candidate("WDAY",  "Workday",                 "US", "Nasdaq"),
+    Candidate("TEAM",  "Atlassian",               "US", "Nasdaq"),
+    Candidate("HUBS",  "HubSpot",                 "US", "NYSE"),
+    Candidate("FTNT",  "Fortinet",                "US", "Nasdaq"),
+    Candidate("GTLB",  "GitLab",                  "US", "Nasdaq"),
+    Candidate("S",     "SentinelOne",             "US", "NYSE"),
+    Candidate("DASH",  "DoorDash",                "US", "Nasdaq"),
+    Candidate("DUOL",  "Duolingo",                "US", "Nasdaq"),
+    Candidate("TOST",  "Toast",                   "US", "NYSE"),
+    # Fintech / consumer
+    Candidate("HOOD",  "Robinhood Markets",       "US", "Nasdaq"),
+    Candidate("COIN",  "Coinbase Global",         "US", "Nasdaq"),
+    Candidate("CAVA",  "CAVA Group",              "US", "NYSE"),
+    Candidate("ONON",  "On Holding",              "US", "NYSE"),
+    Candidate("AXON",  "Axon Enterprise",         "US", "Nasdaq"),
     # Small-cap / emerging growth
     Candidate("SOFI",  "SoFi Technologies",       "US", "Nasdaq"),
     Candidate("AFRM",  "Affirm Holdings",         "US", "Nasdaq"),
     Candidate("IOT",   "Samsara",                 "US", "NYSE"),
     Candidate("ESTC",  "Elastic",                 "US", "NYSE"),
     Candidate("CELH",  "Celsius Holdings",        "US", "Nasdaq"),
+    Candidate("RKLB",  "Rocket Lab",              "US", "Nasdaq"),
+    Candidate("ASTS",  "AST SpaceMobile",         "US", "Nasdaq"),
 ]
 
 # ---------------------------------------------------------------------------
@@ -118,6 +146,52 @@ _EU: list[Candidate] = [
     Candidate("WISE.L",   "Wise",                    "EU", "London Stock Exchange"),
     Candidate("EVO.ST",   "Evolution AB",            "EU", "Nasdaq Stockholm"),
     Candidate("GFC.PA",   "Gecina",                  "EU", "Euronext Paris"),
+    # Germany (Xetra) — large/mid
+    Candidate("ALV.DE",   "Allianz",                 "EU", "Xetra"),
+    Candidate("MBG.DE",   "Mercedes-Benz Group",     "EU", "Xetra"),
+    Candidate("BMW.DE",   "BMW",                     "EU", "Xetra"),
+    Candidate("BAS.DE",   "BASF",                    "EU", "Xetra"),
+    Candidate("MRK.DE",   "Merck KGaA",              "EU", "Xetra"),
+    Candidate("SY1.DE",   "Symrise",                 "EU", "Xetra"),
+    # France (Euronext Paris) — large/mid
+    Candidate("BNP.PA",   "BNP Paribas",             "EU", "Euronext Paris"),
+    Candidate("CAP.PA",   "Capgemini",               "EU", "Euronext Paris"),
+    Candidate("EL.PA",    "EssilorLuxottica",        "EU", "Euronext Paris"),
+    Candidate("SAF.PA",   "Safran",                  "EU", "Euronext Paris"),
+    Candidate("KER.PA",   "Kering",                  "EU", "Euronext Paris"),
+    Candidate("DG.PA",    "Vinci",                   "EU", "Euronext Paris"),
+    # UK (London Stock Exchange)
+    Candidate("RR.L",     "Rolls-Royce Holdings",    "EU", "London Stock Exchange"),
+    Candidate("GSK.L",    "GSK",                     "EU", "London Stock Exchange"),
+    Candidate("ULVR.L",   "Unilever",                "EU", "London Stock Exchange"),
+    Candidate("REL.L",    "RELX",                    "EU", "London Stock Exchange"),
+    Candidate("HSBA.L",   "HSBC Holdings",           "EU", "London Stock Exchange"),
+    Candidate("DGE.L",    "Diageo",                  "EU", "London Stock Exchange"),
+    # Italy (Borsa Italiana)
+    Candidate("RACE.MI",  "Ferrari",                 "EU", "Borsa Italiana"),
+    Candidate("STLAM.MI", "Stellantis",              "EU", "Borsa Italiana"),
+    Candidate("UCG.MI",   "UniCredit",               "EU", "Borsa Italiana"),
+    # Spain (BME)
+    Candidate("SAN.MC",   "Banco Santander",         "EU", "BME (Madrid)"),
+    Candidate("BBVA.MC",  "BBVA",                    "EU", "BME (Madrid)"),
+    Candidate("IBE.MC",   "Iberdrola",               "EU", "BME (Madrid)"),
+    # Switzerland (SIX)
+    Candidate("UBSG.SW",  "UBS Group",               "EU", "SIX Swiss Exchange"),
+    Candidate("ROG.SW",   "Roche Holding",           "EU", "SIX Swiss Exchange"),
+    Candidate("GIVN.SW",  "Givaudan",                "EU", "SIX Swiss Exchange"),
+    # Netherlands / Belgium (Euronext)
+    Candidate("HEIA.AS",  "Heineken",                "EU", "Euronext Amsterdam"),
+    Candidate("WKL.AS",   "Wolters Kluwer",          "EU", "Euronext Amsterdam"),
+    Candidate("BESI.AS",  "BE Semiconductor",        "EU", "Euronext Amsterdam"),
+    Candidate("ABI.BR",   "Anheuser-Busch InBev",    "EU", "Euronext Brussels"),
+    # Nordics
+    Candidate("VOLV-B.ST","Volvo",                   "EU", "Nasdaq Stockholm"),
+    Candidate("ATCO-A.ST","Atlas Copco",             "EU", "Nasdaq Stockholm"),
+    Candidate("INVE-B.ST","Investor AB",             "EU", "Nasdaq Stockholm"),
+    Candidate("NOVO-B.CO","Novo Nordisk (Copenhagen)", "EU", "Nasdaq Copenhagen"),
+    Candidate("DSV.CO",   "DSV",                     "EU", "Nasdaq Copenhagen"),
+    Candidate("EQNR.OL",  "Equinor",                 "EU", "Oslo Bors"),
+    Candidate("NOKIA.HE", "Nokia",                   "EU", "Nasdaq Helsinki"),
     # Small-cap / emerging growth
     Candidate("ARGX.BR",  "argenx",                  "EU", "Euronext Brussels"),
     Candidate("TEP.PA",   "Teleperformance",         "EU", "Euronext Paris"),
