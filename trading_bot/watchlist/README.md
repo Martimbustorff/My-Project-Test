@@ -54,6 +54,23 @@ python -m watchlist.cli --tickers IREN CRDO RVMD FTNT RKLB GMAB GENI \
 This produces the same four ranked tables (composite #1 → weakest), so you can
 see at a glance which holdings the data favours and which to be cautious on.
 
+### Thin-coverage upside & high-conviction override
+
+A spectacular price-target upside backed by **only one or two analysts** (common
+on micro-caps) is unreliable, so the upside score is **shrunk toward neutral**
+in proportion to analyst coverage (fewer than 5 covering analysts → progressive
+discount). This stops sparsely-covered names from topping the ranking on a
+single estimate.
+
+Because no data source can certify that a company will *"100% become a future
+giant"*, that judgement stays human: flag names you have independent conviction
+in with `--high-conviction`, and they bypass the penalty.
+
+```bash
+python -m watchlist.cli --tickers RKLB XNDU AUTL IREN \
+                        --high-conviction RKLB        # RKLB keeps full upside
+```
+
 When the bot runs (`python main.py`), the watchlist is also regenerated
 automatically **every Monday at 08:00 ET** and saved to
 `WATCHLIST_OUTPUT_DIR` (default `./watchlists/`) as

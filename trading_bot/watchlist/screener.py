@@ -56,9 +56,13 @@ class Screener:
         Thresholds for the "growing stock" qualification.
     """
 
-    def __init__(self, weights: Optional[dict] = None, gate: Optional[GrowthGate] = None):
+    def __init__(self, weights: Optional[dict] = None, gate: Optional[GrowthGate] = None,
+                 high_conviction: Optional[set[str]] = None):
         self._weights = weights
         self._gate = gate
+        # Symbols the user has flagged as high-conviction disruptors; their
+        # upside score bypasses the thin-coverage penalty.
+        self._high_conviction = {s.upper() for s in (high_conviction or set())}
 
     # ------------------------------------------------------------------
     # Public API
@@ -82,6 +86,7 @@ class Screener:
         if raw is None:
             return None
         metrics = self._build_metrics(cand, raw)
+        metrics.high_conviction = cand.symbol.upper() in self._high_conviction
         return apply_scores(metrics, weights=self._weights, gate=self._gate)
 
     # ------------------------------------------------------------------
