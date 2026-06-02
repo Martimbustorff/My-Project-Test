@@ -39,6 +39,21 @@ python -m watchlist.cli --save --out-dir watchlists
 python -m watchlist.cli --require-momentum
 ```
 
+### Score your own portfolio
+
+Pass your holdings with `--tickers` to rank exactly what you own (buy / hold /
+trim) instead of the built-in universe. Region is inferred from the suffix
+(`ASML.AS` → EU, `IREN` → US). By default every holding is shown and ranked;
+add `--only-growing` to keep just the names that pass the growth gate.
+
+```bash
+python -m watchlist.cli --tickers IREN CRDO RVMD FTNT RKLB GMAB GENI \
+                                  NNE PL AUTL XNDU GLUE TYGO INDI
+```
+
+This produces the same four ranked tables (composite #1 → weakest), so you can
+see at a glance which holdings the data favours and which to be cautious on.
+
 When the bot runs (`python main.py`), the watchlist is also regenerated
 automatically **every Monday at 08:00 ET** and saved to
 `WATCHLIST_OUTPUT_DIR` (default `./watchlists/`) as

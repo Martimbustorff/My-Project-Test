@@ -35,8 +35,17 @@ def build_arg_parser() -> argparse.ArgumentParser:
         description="Generate the weekly dynamic stock watchlist "
                     "(growing US & European stocks, ≤3-month horizon)."
     )
+    p.add_argument("--tickers", nargs="+", default=None,
+                   help="Screen an explicit list of tickers (e.g. your own "
+                        "portfolio: --tickers IREN CRDO RVMD FTNT) instead of "
+                        "the built-in universe. EU tickers keep their suffix "
+                        "(ASML.AS, SAP.DE).")
+    p.add_argument("--only-growing", action="store_true",
+                   help="With --tickers, keep only holdings that pass the "
+                        "growing-stock gate (default: show & rank them all).")
     p.add_argument("--regions", nargs="+", default=["US", "EU"],
-                   help="Regions to include (US EU). Default: US EU.")
+                   help="Regions to include (US EU). Default: US EU. "
+                        "Ignored when --tickers is given.")
     p.add_argument("--top", type=int, default=10,
                    help="Number of names to surface per ranked list (default 10).")
     p.add_argument("--horizon-days", type=int, default=90,
@@ -74,7 +83,12 @@ def main(argv: list[str] | None = None) -> int:
         gate=gate,
     )
 
-    watchlist = builder.build()
+    if args.tickers:
+        from .universe import candidates_from_tickers
+        cands = candidates_from_tickers(args.tickers)
+        watchlist = builder.build(candidates=cands, include_all=not args.only_growing)
+    else:
+        watchlist = builder.build()
 
     if args.markdown:
         print(to_markdown(watchlist))

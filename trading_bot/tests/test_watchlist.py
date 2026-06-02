@@ -30,6 +30,7 @@ from watchlist.universe import (
     us_universe,
     eu_universe,
     universe_for_regions,
+    candidates_from_tickers,
 )
 from watchlist.watchlist import WatchlistBuilder, WeeklyWatchlist, _monday_of
 from watchlist.report import to_markdown
@@ -270,6 +271,40 @@ class TestUniverse:
         assert len(symbols) == len(set(symbols))
 
 
+class TestCandidatesFromTickers:
+    def test_infers_us_for_bare_ticker(self):
+        cands = candidates_from_tickers(["IREN", "FTNT"])
+        assert all(c.region == "US" for c in cands)
+
+    def test_infers_eu_for_suffixed_ticker(self):
+        cands = candidates_from_tickers(["ASML.AS", "SAP.DE", "AZN.L"])
+        assert all(c.region == "EU" for c in cands)
+
+    def test_mixed_portfolio(self):
+        cands = candidates_from_tickers(["IREN", "ASML.AS"])
+        by_sym = {c.symbol: c.region for c in cands}
+        assert by_sym["IREN"] == "US"
+        assert by_sym["ASML.AS"] == "EU"
+
+    def test_uppercases_and_dedupes(self):
+        cands = candidates_from_tickers(["iren", "IREN", " ftnt "])
+        syms = [c.symbol for c in cands]
+        assert syms == ["IREN", "FTNT"]
+
+    def test_us_listed_adr_stays_us(self):
+        # ADRs like NVO/GMAB are US-listed → no EU suffix → US
+        cands = candidates_from_tickers(["NVO", "GMAB"])
+        assert all(c.region == "US" for c in cands)
+
+    def test_names_override(self):
+        cands = candidates_from_tickers(["IREN"], names={"IREN": "Iris Energy"})
+        assert cands[0].name == "Iris Energy"
+
+    def test_empty_entries_skipped(self):
+        assert candidates_from_tickers(["", "  ", "IREN"]) == \
+            candidates_from_tickers(["IREN"])
+
+
 # ---------------------------------------------------------------------------
 # WatchlistBuilder (with a stub screener — no network)
 # ---------------------------------------------------------------------------
@@ -353,6 +388,26 @@ class TestWatchlistBuilder:
         wl = self._builder([]).build()
         assert wl.qualified_count == 0
         assert wl.top_overall == []
+
+    def test_include_all_ranks_non_growing(self):
+        # Portfolio mode: a non-growing holding should still appear.
+        metrics = [
+            _scored("KEEP", "US", 90, 90, 90, growing=True),
+            _scored("WEAK", "US", 20, 20, 20, growing=False),
+        ]
+        wl = self._builder(metrics).build(include_all=True)
+        symbols = {r.symbol for r in wl.top_overall}
+        assert symbols == {"KEEP", "WEAK"}
+        # Ranking still respected: stronger composite first.
+        assert wl.top_overall[0].symbol == "KEEP"
+
+    def test_include_all_false_still_filters(self):
+        metrics = [
+            _scored("KEEP", "US", 90, 90, 90, growing=True),
+            _scored("WEAK", "US", 20, 20, 20, growing=False),
+        ]
+        wl = self._builder(metrics).build(include_all=False)
+        assert {r.symbol for r in wl.top_overall} == {"KEEP"}
 
 
 # ---------------------------------------------------------------------------

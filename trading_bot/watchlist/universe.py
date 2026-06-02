@@ -226,3 +226,39 @@ def universe_for_regions(regions: list[str]) -> list[Candidate]:
     wanted = {r.upper() for r in regions}
     selected = [c for c in default_universe() if c.region in wanted]
     return selected or default_universe()
+
+
+# European exchange suffixes used by the data provider (yfinance / FMP).
+_EU_SUFFIXES = {
+    ".AS", ".PA", ".DE", ".F", ".L", ".MI", ".MC", ".SW", ".BR", ".ST",
+    ".CO", ".OL", ".HE", ".LS", ".VI", ".IR", ".BD", ".AT", ".WA", ".PR",
+}
+
+
+def candidates_from_tickers(
+    tickers: list[str], names: dict[str, str] | None = None
+) -> list[Candidate]:
+    """
+    Build :class:`Candidate` entries from an arbitrary list of tickers — e.g. a
+    user's own portfolio — so the screener can rank holdings directly.
+
+    Region is inferred from the exchange suffix (``ASML.AS`` → EU, ``IREN`` →
+    US); bare/US-listed tickers (including ADRs like ``NVO``) default to US.
+    A friendly name can be supplied via *names* (``{symbol: name}``); otherwise
+    the screener fills it from the provider, falling back to the symbol.
+    """
+    names = names or {}
+    out: list[Candidate] = []
+    seen: set[str] = set()
+    for raw in tickers:
+        sym = raw.strip().upper()
+        if not sym or sym in seen:
+            continue
+        seen.add(sym)
+        region, exchange = "US", "US / other"
+        if "." in sym:
+            suffix = sym[sym.rfind("."):]
+            if suffix in _EU_SUFFIXES:
+                region, exchange = "EU", "European exchange"
+        out.append(Candidate(sym, names.get(sym, sym), region, exchange))
+    return out

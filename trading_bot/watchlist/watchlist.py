@@ -141,11 +141,17 @@ class WatchlistBuilder:
         """The candidate list for the configured regions."""
         return universe_for_regions(self.regions)
 
-    def build(self, candidates: Optional[list[Candidate]] = None) -> WeeklyWatchlist:
+    def build(
+        self,
+        candidates: Optional[list[Candidate]] = None,
+        include_all: bool = False,
+    ) -> WeeklyWatchlist:
         """
         Screen the universe and assemble the ranked weekly watchlist.
 
-        Only candidates that pass the growing-stock gate are ranked.
+        By default only candidates that pass the growing-stock gate are ranked.
+        Set *include_all* (used for portfolio mode, where every holding should
+        appear regardless of the gate) to rank all screened names.
         """
         cands = candidates if candidates is not None else self.candidates()
         logger.info("Screening %d candidates across %s …", len(cands), self.regions)
@@ -155,7 +161,8 @@ class WatchlistBuilder:
         logger.info("%d of %d screened names qualified as growing.",
                     len(growing), len(scored))
 
-        return self.assemble(growing, universe_size=len(cands))
+        selected = scored if include_all else growing
+        return self.assemble(selected, universe_size=len(cands))
 
     def assemble(self, growing: list[StockMetrics], universe_size: int) -> WeeklyWatchlist:
         """Rank an already-screened list of growing names into a watchlist."""
