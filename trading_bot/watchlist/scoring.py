@@ -85,6 +85,9 @@ class StockMetrics:
     price_change_3m: Optional[float] = None      # fraction over ~3 months
     above_50d_ma: Optional[bool] = None
 
+    # ── conviction override (manual, user-set) ───────────────────────────
+    high_conviction: bool = False
+
     # ── derived scores (0–100) ───────────────────────────────────────────
     upside_score: float = 0.0
     growth_score: float = 0.0
@@ -101,7 +104,17 @@ class StockMetrics:
 # Dimension 1 — analyst upside
 # ---------------------------------------------------------------------------
 
-def score_upside(upside_pct: Optional[float]) -> float:
+# Below this many covering analysts, a price target is treated as
+# lower-confidence and its upside score is shrunk toward neutral.
+MIN_TARGET_ANALYSTS = 5
+
+
+def score_upside(
+    upside_pct: Optional[float],
+    num_analysts: Optional[int] = None,
+    high_conviction: bool = False,
+    min_analysts: int = MIN_TARGET_ANALYSTS,
+) -> float:
     """
     Score the analyst price-target upside on a 0–100 scale.
 
@@ -110,11 +123,29 @@ def score_upside(upside_pct: Optional[float]) -> float:
           0% upside →  25
         +30% upside → 100
 
+    **Thin-coverage handling:** a huge upside backed by only one or two
+    analysts is unreliable (e.g. a single bullish target on a micro-cap), so
+    when fewer than *min_analysts* cover the name the score is shrunk toward the
+    neutral 50 midpoint, proportionally to coverage. This stops sparsely-covered
+    names from dominating the ranking on the strength of a single estimate.
+
+    *high_conviction* bypasses the shrink entirely — a manual override for names
+    the user has independently judged to be high-conviction disruptors (no data
+    source can certify "future greatness", so this is a deliberate human call).
+
     A missing/None upside returns a neutral 50.
     """
     if upside_pct is None:
         return 50.0
-    return round(_lerp(upside_pct, -0.10, 0.30, 0.0, 100.0), 2)
+    base = _lerp(upside_pct, -0.10, 0.30, 0.0, 100.0)
+    if (
+        not high_conviction
+        and num_analysts is not None
+        and num_analysts < min_analysts
+    ):
+        coverage = _clip(num_analysts / min_analysts, 0.0, 1.0)
+        base = 50.0 + (base - 50.0) * coverage
+    return round(base, 2)
 
 
 def compute_upside_pct(current_price: Optional[float],
@@ -295,7 +326,11 @@ def apply_scores(metrics: StockMetrics,
             metrics.current_price, metrics.target_mean_price
         )
 
-    metrics.upside_score = score_upside(metrics.upside_pct)
+    metrics.upside_score = score_upside(
+        metrics.upside_pct,
+        num_analysts=metrics.num_analysts,
+        high_conviction=metrics.high_conviction,
+    )
     metrics.growth_score = score_growth(
         metrics.revenue_growth, metrics.earnings_growth, metrics.revenue_cagr
     )

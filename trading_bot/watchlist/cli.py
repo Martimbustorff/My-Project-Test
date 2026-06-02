@@ -54,6 +54,10 @@ def build_arg_parser() -> argparse.ArgumentParser:
                    help="Minimum YoY revenue growth to qualify (fraction, default 0.05).")
     p.add_argument("--require-momentum", action="store_true",
                    help="Require a positive ≤3-month price trend to qualify.")
+    p.add_argument("--high-conviction", nargs="*", default=None, metavar="SYM",
+                   help="Tickers to exempt from the thin-coverage upside penalty "
+                        "— a manual 'high-conviction disruptor' override "
+                        "(e.g. --high-conviction RKLB XNDU). Use sparingly.")
     p.add_argument("--markdown", action="store_true",
                    help="Print Markdown instead of the Rich terminal report.")
     p.add_argument("--save", action="store_true",
@@ -81,6 +85,7 @@ def main(argv: list[str] | None = None) -> int:
         horizon_days=args.horizon_days,
         top_n=args.top,
         gate=gate,
+        high_conviction=set(args.high_conviction) if args.high_conviction else None,
     )
 
     if args.tickers:

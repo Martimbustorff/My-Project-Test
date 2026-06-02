@@ -71,6 +71,33 @@ class TestScoreUpside:
         for v in (-5, -0.2, 0, 0.1, 0.5, 5):
             assert 0.0 <= score_upside(v) <= 100.0
 
+    def test_thin_coverage_shrinks_upside_toward_neutral(self):
+        # A huge upside backed by 1 analyst should be pulled toward 50.
+        full = score_upside(0.50, num_analysts=20)      # well-covered
+        thin = score_upside(0.50, num_analysts=1)        # single analyst
+        assert full == 100.0
+        assert 50.0 < thin < full
+
+    def test_more_analysts_means_less_shrink(self):
+        a1 = score_upside(0.50, num_analysts=1)
+        a3 = score_upside(0.50, num_analysts=3)
+        assert a1 < a3 < score_upside(0.50, num_analysts=20)
+
+    def test_no_count_means_no_penalty(self):
+        assert score_upside(0.50, num_analysts=None) == 100.0
+
+    def test_high_conviction_bypasses_penalty(self):
+        thin = score_upside(0.50, num_analysts=1)
+        conviction = score_upside(0.50, num_analysts=1, high_conviction=True)
+        assert conviction == 100.0
+        assert conviction > thin
+
+    def test_thin_coverage_does_not_help_negative_upside(self):
+        # Shrinking toward 50 should lift a very negative score, but a
+        # well-covered downside stays low — sanity that direction is correct.
+        assert score_upside(-0.50, num_analysts=20) == 0.0
+        assert score_upside(-0.50, num_analysts=1) > 0.0  # pulled toward 50
+
 
 class TestComputeUpsidePct:
     def test_basic(self):
@@ -237,6 +264,25 @@ class TestApplyScores:
         m = _metrics(upside_pct=0.10, revenue_growth=0.20)
         apply_scores(m)
         assert m.upside_pct == 0.10
+
+    def test_thin_coverage_penalises_composite(self):
+        # Two identical names except analyst coverage: the 1-analyst one should
+        # score a lower upside (and thus composite) than the 30-analyst one.
+        thin = _metrics(symbol="THIN", upside_pct=0.80, revenue_growth=0.20,
+                        recommendation_mean=2.0, num_analysts=1)
+        broad = _metrics(symbol="BRD", upside_pct=0.80, revenue_growth=0.20,
+                         recommendation_mean=2.0, num_analysts=30)
+        apply_scores(thin)
+        apply_scores(broad)
+        assert thin.upside_score < broad.upside_score
+        assert thin.composite_score < broad.composite_score
+
+    def test_high_conviction_flag_exempts_from_penalty(self):
+        thin = _metrics(symbol="THIN", upside_pct=0.80, revenue_growth=0.20,
+                        recommendation_mean=2.0, num_analysts=1)
+        thin.high_conviction = True
+        apply_scores(thin)
+        assert thin.upside_score == 100.0
 
 
 # ---------------------------------------------------------------------------

@@ -129,11 +129,14 @@ class WatchlistBuilder:
         weights: Optional[dict] = None,
         gate: Optional[GrowthGate] = None,
         screener: Optional[Screener] = None,
+        high_conviction: Optional[set[str]] = None,
     ):
         self.regions = [r.upper() for r in (regions or ["US", "EU"])]
         self.horizon_days = horizon_days
         self.top_n = top_n
-        self._screener = screener or Screener(weights=weights, gate=gate)
+        self._screener = screener or Screener(
+            weights=weights, gate=gate, high_conviction=high_conviction
+        )
 
     # ------------------------------------------------------------------
 
