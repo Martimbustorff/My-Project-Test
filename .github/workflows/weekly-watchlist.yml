@@ -1,0 +1,95 @@
+name: Weekly Stock Watchlist
+
+# Generates the weekly growing-stock watchlist (built-in US+EU universe) and a
+# ranking of your own portfolio, using live market data via yfinance.
+#
+# GitHub-hosted runners have internet access, so this works where the cloud
+# session does not. Runs every Monday 08:00 UTC and can be triggered manually.
+#
+# NOTE: scheduled runs only fire once this workflow is on the repo's DEFAULT
+# branch (merge PR #6). You can run it any time from this branch via the
+# "Run workflow" button (workflow_dispatch).
+
+on:
+  schedule:
+    - cron: "0 8 * * 1"   # Mondays 08:00 UTC
+  workflow_dispatch:
+    inputs:
+      tickers:
+        description: "Space-separated portfolio tickers to rank (EU keep suffix, e.g. ASML.AS)"
+        required: false
+        default: "IREN CRDO RVMD FTNT RKLB GMAB GENI NNE PL AUTL XNDU GLUE TYGO INDI"
+
+permissions:
+  contents: write   # allow committing the generated reports back
+
+env:
+  # Default portfolio used by the scheduled run (workflow_dispatch can override).
+  DEFAULT_TICKERS: "IREN CRDO RVMD FTNT RKLB GMAB GENI NNE PL AUTL XNDU GLUE TYGO INDI"
+
+jobs:
+  watchlist:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: trading_bot
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          # Core deps only — the watchlist does not need the ML/TA extras.
+          pip install "yfinance>=0.2.50" "pandas>=2.2.0" "numpy>=1.26.0" \
+                      "rich>=13.7.0" "requests>=2.31.0" "python-dotenv>=1.0.0" \
+                      "pytz>=2024.1"
+
+      - name: Generate watchlist (universe + portfolio)
+        env:
+          PYTHONPATH: ${{ github.workspace }}/trading_bot
+          TICKERS: ${{ github.event.inputs.tickers || env.DEFAULT_TICKERS }}
+        run: |
+          DATE=$(date -u +%F)
+          mkdir -p watchlists
+
+          echo "Generating growing-stock universe watchlist…"
+          python -m watchlist.cli --markdown \
+            > "watchlists/universe_${DATE}.md"
+
+          echo "Generating portfolio ranking for: $TICKERS"
+          python -m watchlist.cli --tickers $TICKERS --markdown \
+            > "watchlists/portfolio_${DATE}.md"
+
+          # Surface both reports in the Actions run summary.
+          {
+            echo "# 📈 Weekly Stock Watchlist — ${DATE}"
+            echo ""
+            echo "## Your portfolio"
+            echo ""
+            cat "watchlists/portfolio_${DATE}.md"
+            echo ""
+            echo "---"
+            echo ""
+            echo "## Growing-stock universe (US + EU)"
+            echo ""
+            cat "watchlists/universe_${DATE}.md"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Commit reports
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add watchlists
+          if git diff --staged --quiet; then
+            echo "No watchlist changes to commit."
+          else
+            git commit -m "chore: weekly stock watchlist ($(date -u +%F))"
+            git push
+          fi
