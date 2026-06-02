@@ -18,6 +18,7 @@ Scheduler jobs
     Every 60 min  : news_refresh()         – refresh news/sentiment cache
     Daily  9:25 ET: pre_market_setup()     – fundamentals + shortability
     Daily 16:05 ET: end_of_day_report()    – snapshot + summary
+    Mon    8:00 ET: weekly_watchlist()      – growing-stock watchlist (≤3-month)
 """
 
 from __future__ import annotations
@@ -269,6 +270,39 @@ def end_of_day_report() -> None:
         pass
 
 
+def weekly_watchlist() -> None:
+    """Weekly job (Mon 08:00 ET): generate the dynamic growing-stock watchlist."""
+    cfg = _components["cfg"]
+    logger.info("Generating weekly stock watchlist …")
+    try:
+        from watchlist.watchlist import WatchlistBuilder, save_watchlist
+        from watchlist.scoring import GrowthGate
+        from watchlist.report import to_markdown
+
+        gate = GrowthGate(
+            min_revenue_growth=cfg.WATCHLIST_MIN_REVENUE_GROWTH,
+            require_positive_momentum=cfg.WATCHLIST_REQUIRE_MOMENTUM,
+        )
+        builder = WatchlistBuilder(
+            regions=cfg.WATCHLIST_REGIONS,
+            horizon_days=cfg.WATCHLIST_HORIZON_DAYS,
+            top_n=cfg.WATCHLIST_TOP_N,
+            weights=cfg.WATCHLIST_WEIGHTS,
+            gate=gate,
+        )
+        wl = builder.build()
+        json_path = save_watchlist(wl, cfg.WATCHLIST_OUTPUT_DIR)
+        from pathlib import Path
+        md_path = Path(cfg.WATCHLIST_OUTPUT_DIR) / f"watchlist_{wl.week_of}.md"
+        md_path.write_text(to_markdown(wl), encoding="utf-8")
+        logger.info(
+            "Weekly watchlist ready: %d/%d qualified → %s",
+            wl.qualified_count, wl.universe_size, json_path,
+        )
+    except Exception as exc:
+        logger.error("weekly_watchlist error: %s", exc)
+
+
 def _update_dashboard() -> None:
     if not _use_dashboard:
         return
@@ -329,6 +363,11 @@ def _build_scheduler():
         end_of_day_report,
         CronTrigger(hour=16, minute=5, timezone=et),
         id="end_of_day_report",
+    )
+    sch.add_job(
+        weekly_watchlist,
+        CronTrigger(day_of_week="mon", hour=8, minute=0, timezone=et),
+        id="weekly_watchlist",
     )
     return sch
 

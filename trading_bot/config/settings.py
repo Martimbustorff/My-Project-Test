@@ -189,6 +189,42 @@ class Settings:
     SENTIMENT_BATCH_SIZE: int = int(os.environ.get("SENTIMENT_BATCH_SIZE", "8"))
 
     # ---------------------------------------------------------------------------
+    # Weekly watchlist (growing US & European stocks, ≤3-month horizon)
+    # ---------------------------------------------------------------------------
+    WATCHLIST_REGIONS: list = [
+        r.strip().upper()
+        for r in os.environ.get("WATCHLIST_REGIONS", "US,EU").split(",")
+        if r.strip()
+    ]
+    """Regions screened for the weekly watchlist (e.g. ``["US", "EU"]``)."""
+
+    WATCHLIST_HORIZON_DAYS: int = int(os.environ.get("WATCHLIST_HORIZON_DAYS", "90"))
+    """Target holding horizon for recommendations (~3 months)."""
+
+    WATCHLIST_TOP_N: int = int(os.environ.get("WATCHLIST_TOP_N", "10"))
+    """Number of names surfaced per ranked list."""
+
+    WATCHLIST_MIN_REVENUE_GROWTH: float = float(
+        os.environ.get("WATCHLIST_MIN_REVENUE_GROWTH", "0.05")
+    )
+    """Minimum YoY revenue growth (fraction) to qualify as a growing stock."""
+
+    WATCHLIST_REQUIRE_MOMENTUM: bool = (
+        os.environ.get("WATCHLIST_REQUIRE_MOMENTUM", "false").lower() == "true"
+    )
+    """Require a positive ≤3-month price trend to qualify."""
+
+    WATCHLIST_OUTPUT_DIR: str = os.environ.get("WATCHLIST_OUTPUT_DIR", "watchlists")
+    """Directory where weekly JSON/Markdown snapshots are saved."""
+
+    WATCHLIST_WEIGHTS: dict = {
+        "upside": float(os.environ.get("WATCHLIST_UPSIDE_WEIGHT", "0.40")),
+        "growth": float(os.environ.get("WATCHLIST_GROWTH_WEIGHT", "0.35")),
+        "consensus": float(os.environ.get("WATCHLIST_CONSENSUS_WEIGHT", "0.25")),
+    }
+    """Composite-score weighting across the three ranking dimensions."""
+
+    # ---------------------------------------------------------------------------
     # Sector ETF mapping used for sector performance
     # ---------------------------------------------------------------------------
     SECTOR_ETFS: dict = {
