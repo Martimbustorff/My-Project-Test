@@ -64,6 +64,15 @@ def build_arg_parser() -> argparse.ArgumentParser:
                    help="Save a JSON snapshot (and Markdown) to --out-dir.")
     p.add_argument("--out-dir", default="watchlists",
                    help="Directory for saved snapshots (default ./watchlists).")
+    p.add_argument("--label", default="watchlist",
+                   help="Filename prefix for snapshots, keeping report kinds in "
+                        "separate history series (e.g. --label portfolio).")
+    p.add_argument("--compare", action="store_true",
+                   help="Include a week-over-week 'what changed' section, diffed "
+                        "against the most recent earlier snapshot in --out-dir.")
+    p.add_argument("--no-compare", dest="compare", action="store_false",
+                   help="Skip the week-over-week comparison even when saving.")
+    p.set_defaults(compare=None)
     p.add_argument("--verbose", action="store_true", help="Verbose logging.")
     return p
 
@@ -95,17 +104,30 @@ def main(argv: list[str] | None = None) -> int:
     else:
         watchlist = builder.build()
 
+    # Week-over-week memory: diff against the previous snapshot. Defaults to on
+    # whenever we are also saving (so each run builds on the last), and the
+    # first run simply has no history to compare against.
+    delta = None
+    compare = args.compare if args.compare is not None else args.save
+    if compare:
+        from .history import delta_against_previous
+        delta = delta_against_previous(watchlist, args.out_dir, args.label)
+
     if args.markdown:
-        print(to_markdown(watchlist))
+        print(to_markdown(watchlist, delta))
     else:
         print_report(watchlist)
 
     if args.save:
         out_dir = Path(args.out_dir)
-        json_path = save_watchlist(watchlist, out_dir)
-        md_path = out_dir / f"watchlist_{watchlist.week_of}.md"
-        md_path.write_text(to_markdown(watchlist), encoding="utf-8")
-        print(f"\nSaved: {json_path}\nSaved: {md_path}")
+        # Write the snapshot only after diffing, so we compare against the
+        # previous run rather than the file we are about to create.
+        json_path = save_watchlist(watchlist, out_dir, label=args.label)
+        md_path = out_dir / f"{args.label}_{watchlist.week_of}.md"
+        md_path.write_text(to_markdown(watchlist, delta), encoding="utf-8")
+        latest_path = out_dir / f"{args.label}_latest.md"
+        latest_path.write_text(to_markdown(watchlist, delta), encoding="utf-8")
+        print(f"\nSaved: {json_path}\nSaved: {md_path}\nSaved: {latest_path}")
 
     return 0
 

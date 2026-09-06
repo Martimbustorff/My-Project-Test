@@ -35,6 +35,9 @@ python -m watchlist.cli --markdown
 # Save JSON + Markdown snapshots to ./watchlists/
 python -m watchlist.cli --save --out-dir watchlists
 
+# Keep separate history series, and diff against last week's snapshot
+python -m watchlist.cli --save --label portfolio --tickers IREN CRDO FTNT
+
 # Only keep names that are also in a positive 3-month uptrend
 python -m watchlist.cli --require-momentum
 ```
@@ -76,14 +79,24 @@ automatically **every Monday at 08:00 ET** and saved to
 `WATCHLIST_OUTPUT_DIR` (default `./watchlists/`) as
 `watchlist_<week_of>.json` and `watchlist_<week_of>.md`.
 
+### Week-over-week memory
+
+Saving with `--save` writes `<label>_<week>.json`. The next run finds the most
+recent earlier snapshot for that label and adds a **"What changed since …"**
+section — which names entered, which dropped out, and the biggest rank moves —
+so a holding sliding down the ranking over several weeks is visible, not just
+today's snapshot. The full ranking is recorded (`all_ranked`), not only the
+visible top N, and the first run simply has no history to compare against.
+
 ## Architecture
 
 ```
 watchlist/
 ├── universe.py    # curated US + EU candidate list (any market cap)
 ├── scoring.py     # PURE scoring logic (upside / growth / consensus) — no network
-├── screener.py    # yfinance data fetch → scored StockMetrics (tolerant of gaps)
+├── screener.py    # yfinance data fetch → scored StockMetrics (retries, records failures)
 ├── watchlist.py   # orchestration: screen → gate "growing" → rank → snapshot
+├── history.py     # week-over-week diff against the previous snapshot
 ├── report.py      # Markdown + Rich terminal rendering
 └── cli.py         # `python -m watchlist.cli`
 ```

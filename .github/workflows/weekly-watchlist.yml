@@ -69,13 +69,15 @@ jobs:
             HC_ARG="--high-conviction $HIGH_CONVICTION"
           fi
 
+          # --save writes a JSON snapshot per label; the next week's run diffs
+          # against it to produce the "what changed" section, so each report
+          # builds on the last instead of starting from zero.
           echo "Generating growing-stock universe watchlist…"
-          python -m watchlist.cli --markdown $HC_ARG \
-            > "watchlists/universe_${DATE}.md"
+          python -m watchlist.cli --save --out-dir watchlists --label universe $HC_ARG
 
           echo "Generating portfolio ranking for: $TICKERS"
-          python -m watchlist.cli --tickers $TICKERS $HC_ARG --markdown \
-            > "watchlists/portfolio_${DATE}.md"
+          python -m watchlist.cli --tickers $TICKERS $HC_ARG \
+            --save --out-dir watchlists --label portfolio
 
           # Surface both reports in the Actions run summary.
           {
@@ -83,13 +85,13 @@ jobs:
             echo ""
             echo "## Your portfolio"
             echo ""
-            cat "watchlists/portfolio_${DATE}.md"
+            cat watchlists/portfolio_latest.md
             echo ""
             echo "---"
             echo ""
             echo "## Growing-stock universe (US + EU)"
             echo ""
-            cat "watchlists/universe_${DATE}.md"
+            cat watchlists/universe_latest.md
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Commit reports
