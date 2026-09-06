@@ -277,6 +277,43 @@ class TestApplyScores:
         assert thin.upside_score < broad.upside_score
         assert thin.composite_score < broad.composite_score
 
+    def test_full_data_marks_nothing_estimated(self):
+        m = _metrics(current_price=100.0, target_mean_price=120.0,
+                     revenue_growth=0.20, recommendation_mean=2.0, num_analysts=10)
+        apply_scores(m)
+        assert m.data_coverage == 3
+        assert m.missing_dimensions == []
+
+    def test_missing_growth_is_flagged_not_hidden(self):
+        # No revenue/CAGR/earnings at all -> growth is a neutral fallback.
+        m = _metrics(current_price=100.0, target_mean_price=120.0,
+                     recommendation_mean=2.0, num_analysts=10)
+        apply_scores(m)
+        assert m.growth_score == 50.0          # neutral fallback
+        assert m.growth_estimated is True       # ...and it says so
+        assert m.missing_dimensions == ["growth"]
+        assert m.data_coverage == 2
+
+    def test_missing_upside_and_consensus_flagged(self):
+        m = _metrics(revenue_growth=0.20)
+        apply_scores(m)
+        assert m.upside_estimated is True
+        assert m.consensus_estimated is True
+        assert m.data_coverage == 1
+
+    def test_partial_growth_data_is_not_estimated(self):
+        # Only earnings growth present -> still real data, not a fallback.
+        m = _metrics(earnings_growth=0.30)
+        apply_scores(m)
+        assert m.growth_estimated is False
+
+    def test_to_dict_exposes_coverage(self):
+        m = _metrics(revenue_growth=0.20)
+        apply_scores(m)
+        d = m.to_dict()
+        assert d["data_coverage"] == 1
+        assert "upside" in d["missing_dimensions"]
+
     def test_high_conviction_flag_exempts_from_penalty(self):
         thin = _metrics(symbol="THIN", upside_pct=0.80, revenue_growth=0.20,
                         recommendation_mean=2.0, num_analysts=1)
@@ -460,6 +497,61 @@ class TestWatchlistBuilder:
 # Report rendering
 # ---------------------------------------------------------------------------
 
+class TestScreenerResilience:
+    """Retry + faithful reporting of tickers that never returned data."""
+
+    def _screener(self, behaviour, **kw):
+        from watchlist.screener import Screener
+        s = Screener(retry_backoff=0, **kw)
+        s.screen_one = behaviour           # type: ignore[assignment]
+        return s
+
+    def test_records_symbols_that_never_return_data(self):
+        s = self._screener(lambda cand: None)
+        results = s.screen(candidates_from_tickers(["AAA", "BBB"]))
+        assert results == []
+        assert s.failures == ["AAA", "BBB"]
+
+    def test_exception_is_caught_and_recorded(self):
+        def boom(cand):
+            raise RuntimeError("provider down")
+        s = self._screener(boom)
+        results = s.screen(candidates_from_tickers(["AAA"]))
+        assert results == []
+        assert s.failures == ["AAA"]
+
+    def test_retries_then_succeeds(self):
+        calls = {"n": 0}
+
+        def flaky(cand):
+            calls["n"] += 1
+            if calls["n"] == 1:
+                raise RuntimeError("transient")
+            return _metrics(symbol=cand.symbol)
+
+        s = self._screener(flaky, max_attempts=2)
+        results = s.screen(candidates_from_tickers(["AAA"]))
+        assert len(results) == 1
+        assert s.failures == []
+        assert calls["n"] == 2
+
+    def test_failures_reset_between_runs(self):
+        s = self._screener(lambda cand: None)
+        s.screen(candidates_from_tickers(["AAA"]))
+        s.screen(candidates_from_tickers(["BBB"]))
+        assert s.failures == ["BBB"]
+
+    def test_one_bad_ticker_does_not_kill_the_run(self):
+        def mixed(cand):
+            if cand.symbol == "BAD":
+                raise RuntimeError("nope")
+            return _metrics(symbol=cand.symbol)
+        s = self._screener(mixed)
+        results = s.screen(candidates_from_tickers(["GOOD", "BAD"]))
+        assert [m.symbol for m in results] == ["GOOD"]
+        assert s.failures == ["BAD"]
+
+
 class TestReport:
     def _wl(self):
         metrics = [_scored("AAA", "US", 90, 80, 70)]
@@ -475,6 +567,36 @@ class TestReport:
     def test_markdown_has_disclaimer(self):
         md = to_markdown(self._wl())
         assert "Not investment advice" in md
+
+    def test_clean_run_reports_full_data_quality(self):
+        md = to_markdown(self._wl())
+        assert "Data quality" in md
+        assert "Every ranked name had real data" in md
+
+    def test_failed_symbols_are_named(self):
+        builder = WatchlistBuilder(screener=StubScreener([_scored("AAA", "US", 90, 80, 70)]))
+        wl = builder.assemble(
+            [_scored("AAA", "US", 90, 80, 70)],
+            universe_size=3,
+            failed_symbols=["ZZZ", "QQQ"],
+        )
+        md = to_markdown(wl)
+        assert "No data returned (2)" in md
+        assert "ZZZ" in md and "QQQ" in md
+
+    def test_partial_coverage_is_surfaced(self):
+        m = _metrics(symbol="PART", revenue_growth=0.20)   # no upside/consensus
+        apply_scores(m)
+        m.is_growing = True
+        wl = WatchlistBuilder(screener=StubScreener([m])).assemble([m], universe_size=1)
+        md = to_markdown(wl)
+        assert "Scored on partial data" in md
+        assert "PART" in md
+        assert "upside" in md and "consensus" in md
+
+    def test_coverage_badge_in_overall_table(self):
+        md = to_markdown(self._wl())
+        assert "3/3" in md
 
 
 # ---------------------------------------------------------------------------

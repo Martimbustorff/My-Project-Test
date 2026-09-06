@@ -96,8 +96,37 @@ class StockMetrics:
     is_growing: bool = False
     notes: list[str] = field(default_factory=list)
 
+    # ── data-quality flags ───────────────────────────────────────────────
+    # True when the dimension had NO underlying data and its score is just the
+    # neutral 50 fallback. Without these, a missing input is indistinguishable
+    # from a genuine middling reading — an unverified number masquerading as a
+    # signal, which is exactly what a ranking must never hide.
+    upside_estimated: bool = False
+    growth_estimated: bool = False
+    consensus_estimated: bool = False
+
+    @property
+    def data_coverage(self) -> int:
+        """How many of the three dimensions are backed by real data (0–3)."""
+        return 3 - sum(
+            (self.upside_estimated, self.growth_estimated, self.consensus_estimated)
+        )
+
+    @property
+    def missing_dimensions(self) -> list[str]:
+        """Names of the dimensions whose score is only a neutral fallback."""
+        pairs = (
+            ("upside", self.upside_estimated),
+            ("growth", self.growth_estimated),
+            ("consensus", self.consensus_estimated),
+        )
+        return [name for name, missing in pairs if missing]
+
     def to_dict(self) -> dict:
-        return asdict(self)
+        data = asdict(self)
+        data["data_coverage"] = self.data_coverage
+        data["missing_dimensions"] = self.missing_dimensions
+        return data
 
 
 # ---------------------------------------------------------------------------
@@ -325,6 +354,16 @@ def apply_scores(metrics: StockMetrics,
         metrics.upside_pct = compute_upside_pct(
             metrics.current_price, metrics.target_mean_price
         )
+
+    # Record which dimensions have no underlying data *before* scoring, so a
+    # neutral 50 fallback is never mistaken for a real reading downstream.
+    metrics.upside_estimated = metrics.upside_pct is None
+    metrics.growth_estimated = (
+        metrics.revenue_growth is None
+        and metrics.revenue_cagr is None
+        and metrics.earnings_growth is None
+    )
+    metrics.consensus_estimated = metrics.recommendation_mean is None
 
     metrics.upside_score = score_upside(
         metrics.upside_pct,
