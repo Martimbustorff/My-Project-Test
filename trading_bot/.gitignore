@@ -44,3 +44,6 @@ Thumbs.db
 
 # Model cache (FinBERT downloads)
 model_cache/
+
+# Generated research stacks (working documents, not deliverables)
+research_stacks/
