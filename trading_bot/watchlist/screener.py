@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import logging
 import math
+import time
 from typing import Optional
 
 from .scoring import StockMetrics, GrowthGate, apply_scores
@@ -57,27 +58,61 @@ class Screener:
     """
 
     def __init__(self, weights: Optional[dict] = None, gate: Optional[GrowthGate] = None,
-                 high_conviction: Optional[set[str]] = None):
+                 high_conviction: Optional[set[str]] = None,
+                 max_attempts: int = 2,
+                 retry_backoff: float = 1.0):
         self._weights = weights
         self._gate = gate
         # Symbols the user has flagged as high-conviction disruptors; their
         # upside score bypasses the thin-coverage penalty.
         self._high_conviction = {s.upper() for s in (high_conviction or set())}
+        # Transient provider hiccups are normal, so make failure cheap: retry a
+        # ticker before giving up, and record the ones that never came back.
+        self._max_attempts = max(1, max_attempts)
+        self._retry_backoff = retry_backoff
+        self.failures: list[str] = []
 
     # ------------------------------------------------------------------
     # Public API
     # ------------------------------------------------------------------
 
     def screen(self, candidates: list[Candidate]) -> list[StockMetrics]:
-        """Fetch + score every candidate. Failures are skipped (and logged)."""
+        """
+        Fetch + score every candidate.
+
+        Each ticker is retried on a transient failure; any that still yield no
+        data are recorded in :attr:`failures` so the run can report them
+        explicitly instead of silently shrinking the universe.
+        """
         results: list[StockMetrics] = []
+        self.failures = []
+
         for cand in candidates:
-            try:
-                metrics = self.screen_one(cand)
-                if metrics is not None:
-                    results.append(metrics)
-            except Exception as exc:   # never let one bad ticker kill the run
-                logger.warning("Screening failed for %s: %s", cand.symbol, exc)
+            metrics = None
+            for attempt in range(self._max_attempts):
+                try:
+                    metrics = self.screen_one(cand)
+                    if metrics is not None:
+                        break
+                    logger.warning("No data for %s (attempt %d)", cand.symbol, attempt + 1)
+                except Exception as exc:   # never let one bad ticker kill the run
+                    logger.warning(
+                        "Screening failed for %s (attempt %d): %s",
+                        cand.symbol, attempt + 1, exc,
+                    )
+                if attempt + 1 < self._max_attempts:
+                    time.sleep(self._retry_backoff * (2 ** attempt))
+
+            if metrics is None:
+                self.failures.append(cand.symbol)
+            else:
+                results.append(metrics)
+
+        if self.failures:
+            logger.warning(
+                "%d of %d candidates returned no data: %s",
+                len(self.failures), len(candidates), ", ".join(self.failures),
+            )
         return results
 
     def screen_one(self, cand: Candidate) -> Optional[StockMetrics]:

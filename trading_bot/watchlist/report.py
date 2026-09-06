@@ -74,6 +74,9 @@ def to_markdown(wl: WeeklyWatchlist) -> str:
                                   lambda r: _rec_key(r.recommendation_key)))
     lines.append("")
 
+    lines.append(_data_quality_section(wl))
+    lines.append("")
+
     lines.append("---")
     lines.append(
         "*Scores are 0–100. Composite weighting: 40% upside · 35% growth · "
@@ -87,17 +90,74 @@ def _overall_table(recs: list[Recommendation]) -> str:
         return "_No qualifying stocks this week._"
     header = (
         "| # | Symbol | Name | Region | Composite | Upside | Growth | "
-        "Consensus | 3M Trend |\n"
+        "Consensus | 3M Trend | Data |\n"
         "|---|--------|------|--------|----------:|-------:|-------:|"
-        "----------:|---------:|"
+        "----------:|---------:|:----:|"
     )
     rows = [
         f"| {r.rank} | `{r.symbol}` | {r.name} | {r.region} | "
         f"{r.composite_score:.1f} | {r.upside_score:.0f} | {r.growth_score:.0f} | "
-        f"{r.consensus_score:.0f} | {_fmt_pct(r.price_change_3m)} |"
+        f"{r.consensus_score:.0f} | {_fmt_pct(r.price_change_3m)} | "
+        f"{_coverage_badge(r)} |"
         for r in recs
     ]
     return header + "\n" + "\n".join(rows)
+
+
+def _coverage_badge(r: Recommendation) -> str:
+    """Show how many of the three dimensions are backed by real data."""
+    coverage = getattr(r, "data_coverage", 3)
+    return "✅ 3/3" if coverage == 3 else f"⚠️ {coverage}/3"
+
+
+def _data_quality_section(wl: WeeklyWatchlist) -> str:
+    """
+    Report data gaps explicitly.
+
+    A dimension with no underlying data scores a neutral 50, which would
+    otherwise be indistinguishable from a genuine middling reading. Anything
+    resting on such a fallback — or missing entirely — is named here rather
+    than quietly folded into the ranking.
+    """
+    lines: list[str] = ["## 🔍 Data quality", ""]
+
+    seen: dict[str, list[str]] = {}
+    for group in (wl.top_overall, wl.by_upside, wl.by_growth, wl.by_consensus):
+        for r in group:
+            missing = getattr(r, "missing_dimensions", []) or []
+            if missing:
+                seen.setdefault(r.symbol, missing)
+
+    failed = getattr(wl, "failed_symbols", []) or []
+
+    if not seen and not failed:
+        lines.append(
+            "✅ Every ranked name had real data for all three dimensions, and "
+            "every screened ticker returned data."
+        )
+        return "\n".join(lines)
+
+    if failed:
+        lines.append(
+            f"❌ **No data returned ({len(failed)}):** "
+            + ", ".join(f"`{s}`" for s in failed)
+            + " — excluded from the ranking entirely."
+        )
+        lines.append("")
+
+    if seen:
+        lines.append(
+            "⚠️ **Scored on partial data** — the dimensions below had no "
+            "underlying figures, so they fall back to a neutral 50 and their "
+            "composite is less reliable than a full-coverage name:"
+        )
+        lines.append("")
+        lines.append("| Symbol | Missing dimension(s) |")
+        lines.append("|--------|----------------------|")
+        for symbol in sorted(seen):
+            lines.append(f"| `{symbol}` | {', '.join(seen[symbol])} |")
+
+    return "\n".join(lines)
 
 
 def _dimension_table(recs: list[Recommendation], label: str,

@@ -50,6 +50,8 @@ class Recommendation:
     current_price: Optional[float]
     target_mean_price: Optional[float]
     currency: str
+    data_coverage: int = 3
+    missing_dimensions: list[str] = field(default_factory=list)
 
     @classmethod
     def from_metrics(cls, rank: int, m: StockMetrics) -> "Recommendation":
@@ -70,6 +72,8 @@ class Recommendation:
             current_price=m.current_price,
             target_mean_price=m.target_mean_price,
             currency=m.currency,
+            data_coverage=m.data_coverage,
+            missing_dimensions=m.missing_dimensions,
         )
 
 
@@ -83,6 +87,7 @@ class WeeklyWatchlist:
     regions: list[str]
     universe_size: int
     qualified_count: int
+    failed_symbols: list[str] = field(default_factory=list)
     top_overall: list[Recommendation] = field(default_factory=list)
     by_upside: list[Recommendation] = field(default_factory=list)
     by_growth: list[Recommendation] = field(default_factory=list)
@@ -165,9 +170,13 @@ class WatchlistBuilder:
                     len(growing), len(scored))
 
         selected = scored if include_all else growing
-        return self.assemble(selected, universe_size=len(cands))
+        # Surface tickers the provider never returned, rather than letting the
+        # universe silently shrink. Custom/stub screeners may not track these.
+        failed = list(getattr(self._screener, "failures", []) or [])
+        return self.assemble(selected, universe_size=len(cands), failed_symbols=failed)
 
-    def assemble(self, growing: list[StockMetrics], universe_size: int) -> WeeklyWatchlist:
+    def assemble(self, growing: list[StockMetrics], universe_size: int,
+                 failed_symbols: Optional[list[str]] = None) -> WeeklyWatchlist:
         """Rank an already-screened list of growing names into a watchlist."""
         now = datetime.now(timezone.utc)
         return WeeklyWatchlist(
@@ -177,6 +186,7 @@ class WatchlistBuilder:
             regions=self.regions,
             universe_size=universe_size,
             qualified_count=len(growing),
+            failed_symbols=list(failed_symbols or []),
             top_overall=_rank(growing, "composite_score", self.top_n),
             by_upside=_rank(growing, "upside_score", self.top_n),
             by_growth=_rank(growing, "growth_score", self.top_n),
