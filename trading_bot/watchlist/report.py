@@ -32,8 +32,53 @@ def _rec_key(value: Optional[str]) -> str:
 # Markdown
 # ---------------------------------------------------------------------------
 
-def to_markdown(wl: WeeklyWatchlist) -> str:
-    """Render the watchlist as a Markdown document."""
+def _changes_section(delta) -> str:
+    """Render the week-over-week diff against the previous snapshot."""
+    lines: list[str] = [
+        f"## 🔁 What changed since {delta.previous_week_of}",
+        "",
+    ]
+
+    if not delta.has_changes:
+        lines.append("_No entries, exits or rank changes since the last run._")
+        return "\n".join(lines)
+
+    if delta.entered:
+        lines.append(
+            f"🟢 **Entered ({len(delta.entered)}):** "
+            + ", ".join(f"`{s}`" for s in delta.entered)
+        )
+    if delta.exited:
+        lines.append(
+            f"🔴 **Dropped out ({len(delta.exited)}):** "
+            + ", ".join(f"`{s}`" for s in delta.exited)
+        )
+    if delta.entered or delta.exited:
+        lines.append("")
+
+    movers = delta.biggest_moves()
+    if movers:
+        lines.append("**Biggest rank moves**")
+        lines.append("")
+        lines.append("| Symbol | Was | Now | Move |")
+        lines.append("|--------|----:|----:|:-----|")
+        for m in movers:
+            arrow = "🔺" if m.delta > 0 else "🔻"
+            lines.append(
+                f"| `{m.symbol}` | {m.previous_rank} | {m.current_rank} | "
+                f"{arrow} {abs(m.delta)} |"
+            )
+
+    return "\n".join(lines)
+
+
+def to_markdown(wl: WeeklyWatchlist, delta=None) -> str:
+    """
+    Render the watchlist as a Markdown document.
+
+    When *delta* (a :class:`history.WatchlistDelta`) is supplied, a
+    week-over-week "what changed" section is included.
+    """
     lines: list[str] = []
     lines.append(f"# 📈 Weekly Stock Watchlist — week of {wl.week_of}")
     lines.append("")
@@ -54,6 +99,10 @@ def to_markdown(wl: WeeklyWatchlist) -> str:
         "due diligence."
     )
     lines.append("")
+
+    if delta is not None:
+        lines.append(_changes_section(delta))
+        lines.append("")
 
     lines.append("## 🏆 Top Overall (composite)")
     lines.append(_overall_table(wl.top_overall))

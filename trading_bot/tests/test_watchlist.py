@@ -34,6 +34,11 @@ from watchlist.universe import (
 )
 from watchlist.watchlist import WatchlistBuilder, WeeklyWatchlist, _monday_of
 from watchlist.report import to_markdown
+from watchlist.history import (
+    compare_watchlists,
+    delta_against_previous,
+    find_previous_snapshot,
+)
 
 
 # ---------------------------------------------------------------------------
@@ -602,6 +607,104 @@ class TestReport:
 # ---------------------------------------------------------------------------
 # Misc helpers
 # ---------------------------------------------------------------------------
+
+class TestHistoryMemory:
+    """Week-over-week diffing against the previous snapshot."""
+
+    def _wl(self, symbols_scores):
+        metrics = [_scored(s, "US", v, v, v) for s, v in symbols_scores]
+        return WatchlistBuilder(screener=StubScreener(metrics)).assemble(
+            metrics, universe_size=len(metrics)
+        )
+
+    def test_all_ranked_records_every_name(self):
+        wl = self._wl([("A", 90), ("B", 80), ("C", 70)])
+        assert [r["symbol"] for r in wl.all_ranked] == ["A", "B", "C"]
+        assert [r["rank"] for r in wl.all_ranked] == [1, 2, 3]
+
+    def test_all_ranked_exceeds_top_n(self):
+        metrics = [_scored(f"S{i}", "US", i * 3, i * 3, i * 3) for i in range(15)]
+        wl = WatchlistBuilder(screener=StubScreener(metrics), top_n=5).assemble(
+            metrics, universe_size=15
+        )
+        assert len(wl.top_overall) == 5      # visible table is capped …
+        assert len(wl.all_ranked) == 15      # … memory is not
+
+    def test_detects_entries_and_exits(self):
+        previous = self._wl([("A", 90), ("B", 80)]).to_dict()
+        current = self._wl([("A", 90), ("C", 70)])
+        delta = compare_watchlists(previous, current)
+        assert delta.entered == ["C"]
+        assert delta.exited == ["B"]
+
+    def test_detects_rank_moves(self):
+        previous = self._wl([("A", 90), ("B", 80)]).to_dict()
+        current = self._wl([("B", 95), ("A", 60)])   # B overtakes A
+        delta = compare_watchlists(previous, current)
+        by_symbol = {m.symbol: m for m in delta.moves}
+        assert by_symbol["B"].previous_rank == 2
+        assert by_symbol["B"].current_rank == 1
+        assert by_symbol["B"].delta == 1      # positive = moved up
+        assert by_symbol["A"].delta == -1     # negative = moved down
+
+    def test_no_changes_when_identical(self):
+        previous = self._wl([("A", 90), ("B", 80)]).to_dict()
+        current = self._wl([("A", 90), ("B", 80)])
+        delta = compare_watchlists(previous, current)
+        assert delta.has_changes is False
+
+    def test_biggest_moves_sorted_by_magnitude(self):
+        previous = self._wl([("A", 99), ("B", 90), ("C", 80), ("D", 70)]).to_dict()
+        current = self._wl([("D", 99), ("A", 90), ("B", 80), ("C", 70)])
+        delta = compare_watchlists(previous, current)
+        assert delta.biggest_moves()[0].symbol == "D"   # 4th -> 1st
+
+    def test_falls_back_to_top_overall_for_old_snapshots(self):
+        # A snapshot written before all_ranked existed still diffs correctly.
+        previous = self._wl([("A", 90), ("B", 80)]).to_dict()
+        del previous["all_ranked"]
+        current = self._wl([("A", 90), ("C", 70)])
+        delta = compare_watchlists(previous, current)
+        assert delta.entered == ["C"] and delta.exited == ["B"]
+
+    def test_find_previous_snapshot_picks_latest_earlier(self, tmp_path):
+        for name in ("portfolio_2026-01-05.json", "portfolio_2026-01-12.json",
+                     "portfolio_2026-01-19.json"):
+            (tmp_path / name).write_text("{}", encoding="utf-8")
+        found = find_previous_snapshot(tmp_path, "portfolio",
+                                       before_week_of="2026-01-19")
+        assert found.name == "portfolio_2026-01-12.json"
+
+    def test_find_previous_ignores_other_labels(self, tmp_path):
+        (tmp_path / "universe_2026-01-12.json").write_text("{}", encoding="utf-8")
+        assert find_previous_snapshot(tmp_path, "portfolio") is None
+
+    def test_find_previous_returns_none_on_first_run(self, tmp_path):
+        assert find_previous_snapshot(tmp_path, "portfolio") is None
+
+    def test_delta_against_previous_end_to_end(self, tmp_path):
+        previous = self._wl([("A", 90), ("B", 80)])
+        # Persist last week's snapshot under an earlier date.
+        (tmp_path / "portfolio_2020-01-06.json").write_text(
+            previous.to_json(), encoding="utf-8"
+        )
+        current = self._wl([("A", 90), ("C", 70)])
+        delta = delta_against_previous(current, tmp_path, "portfolio")
+        assert delta is not None
+        assert delta.entered == ["C"] and delta.exited == ["B"]
+
+    def test_markdown_renders_changes_section(self):
+        previous = self._wl([("A", 90), ("B", 80)]).to_dict()
+        current = self._wl([("A", 90), ("C", 70)])
+        delta = compare_watchlists(previous, current)
+        md = to_markdown(current, delta)
+        assert "What changed since" in md
+        assert "Entered (1)" in md and "Dropped out (1)" in md
+
+    def test_markdown_without_delta_has_no_changes_section(self):
+        md = to_markdown(self._wl([("A", 90)]))
+        assert "What changed since" not in md
+
 
 class TestMondayOf:
     def test_monday_of_returns_monday(self):

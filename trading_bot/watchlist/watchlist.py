@@ -92,6 +92,10 @@ class WeeklyWatchlist:
     by_upside: list[Recommendation] = field(default_factory=list)
     by_growth: list[Recommendation] = field(default_factory=list)
     by_consensus: list[Recommendation] = field(default_factory=list)
+    # Compact record of EVERY ranked name, not just the top N. This is the
+    # durable memory a later run compares against, so week-over-week changes
+    # survive even for names that never reach the visible top of a table.
+    all_ranked: list[dict] = field(default_factory=list)
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -104,6 +108,20 @@ def _rank(metrics: list[StockMetrics], key: str, top_n: int) -> list[Recommendat
     """Sort *metrics* by attribute *key* (desc) and wrap the top N as Recommendations."""
     ordered = sorted(metrics, key=lambda m: getattr(m, key), reverse=True)[:top_n]
     return [Recommendation.from_metrics(i + 1, m) for i, m in enumerate(ordered)]
+
+
+def _all_ranked(metrics: list[StockMetrics]) -> list[dict]:
+    """Compact full composite ranking — the record a future run compares to."""
+    ordered = sorted(metrics, key=lambda m: m.composite_score, reverse=True)
+    return [
+        {
+            "rank": i + 1,
+            "symbol": m.symbol,
+            "composite_score": m.composite_score,
+            "data_coverage": m.data_coverage,
+        }
+        for i, m in enumerate(ordered)
+    ]
 
 
 class WatchlistBuilder:
@@ -191,6 +209,7 @@ class WatchlistBuilder:
             by_upside=_rank(growing, "upside_score", self.top_n),
             by_growth=_rank(growing, "growth_score", self.top_n),
             by_consensus=_rank(growing, "consensus_score", self.top_n),
+            all_ranked=_all_ranked(growing),
         )
 
 
@@ -203,14 +222,18 @@ def _monday_of(d: date) -> date:
 # Persistence helpers
 # ---------------------------------------------------------------------------
 
-def save_watchlist(watchlist: WeeklyWatchlist, out_dir: str | Path) -> Path:
+def save_watchlist(watchlist: WeeklyWatchlist, out_dir: str | Path,
+                   label: str = "watchlist") -> Path:
     """
-    Write *watchlist* to ``<out_dir>/watchlist_<week_of>.json`` and return the
+    Write *watchlist* to ``<out_dir>/<label>_<week_of>.json`` and return the
     path.  Creates the directory if needed.
+
+    The *label* keeps separate report kinds (e.g. ``universe`` vs ``portfolio``)
+    in their own snapshot series, so each compares against its own history.
     """
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
-    path = out / f"watchlist_{watchlist.week_of}.json"
+    path = out / f"{label}_{watchlist.week_of}.json"
     path.write_text(watchlist.to_json(), encoding="utf-8")
     logger.info("Watchlist written to %s", path)
     return path
