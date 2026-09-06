@@ -18,7 +18,7 @@ on:
       tickers:
         description: "Space-separated portfolio tickers to rank (EU keep suffix, e.g. ASML.AS)"
         required: false
-        default: "IREN CRDO RVMD FTNT RKLB GMAB GENI NNE PL AUTL XNDU GLUE TYGO INDI"
+        default: "CRDO DAVE KRMN NVMI RKLB SEZL THEON.AS"
       high_conviction:
         description: "Tickers exempt from the thin-coverage upside penalty (manual conviction override)"
         required: false
@@ -29,7 +29,13 @@ permissions:
 
 env:
   # Default portfolio used by the scheduled run (workflow_dispatch can override).
-  DEFAULT_TICKERS: "IREN CRDO RVMD FTNT RKLB GMAB GENI NNE PL AUTL XNDU GLUE TYGO INDI"
+  #
+  # Current holdings (7). Note the broker and the data provider spell the
+  # European name differently: eToro shows THEON.NV, while yfinance uses the
+  # Euronext Amsterdam suffix, THEON.AS. If that mapping is wrong the run will
+  # say so — the report lists tickers that returned no data instead of quietly
+  # dropping them.
+  DEFAULT_TICKERS: "CRDO DAVE KRMN NVMI RKLB SEZL THEON.AS"
 
 jobs:
   watchlist:
