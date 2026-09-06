@@ -37,6 +37,15 @@ math is deterministic and unit-testable, while `screener.py` owns all fetching.
 Read `trading_bot/watchlist/METHODOLOGY.md` before changing any scoring formula,
 weight or threshold; it is the source of truth and must be updated alongside.
 
+## Research committee (`trading_bot/research/`)
+
+The **AI Hedge Fund Team**: seven agents (Market Scout → Technical →
+Fundamental → News → Quant → Risk → Portfolio Manager) that turn one ticker into
+a structured research memo. `python -m research.cli <TICKER>` builds the
+research stack; the `ai-hedge-fund` skill drives the chain. Same purity
+boundary as the watchlist — `agents.py`/`stack.py`/`memo.py` are pure, only
+`packet.py` fetches. It produces **research, never a buy/sell instruction**.
+
 ## Financial-data rules
 
 **IMPORTANT: never fabricate market data.** Prices, analyst targets, consensus
