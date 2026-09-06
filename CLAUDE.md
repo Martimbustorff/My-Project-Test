@@ -46,6 +46,24 @@ research stack; the `ai-hedge-fund` skill drives the chain. Same purity
 boundary as the watchlist — `agents.py`/`stack.py`/`memo.py` are pure, only
 `packet.py` fetches. It produces **research, never a buy/sell instruction**.
 
+## Rotation suggestions (standing request)
+
+**Always end a portfolio analysis with a rotation section.** Compare the weakest
+holdings against the top of the universe ranking and name what would come out,
+what would go in, and why — grounded in the three lenses, not vibes.
+
+Honouring that request does **not** mean manufacturing a trade every week. When
+the data does not support a rotation, say so plainly ("no rotation justified
+this week — here is what would change that"). A forced rotation is worse than
+none: it churns costs and taxes for no edge. Two traps to check every time:
+
+- **Upside inflated by a falling price.** A big gap to an analyst target often
+  means the price dropped and the target is simply stale — not that the name got
+  cheaper on merit. Cross-check the 3-month trend before calling it an entry.
+- **Punishing a winner.** A holding scores low on upside precisely because it has
+  already run. Low upside after a strong rise is not weakness; don't rotate out
+  of what is working just because the composite ranks it last.
+
 ## Financial-data rules
 
 **IMPORTANT: never fabricate market data.** Prices, analyst targets, consensus
