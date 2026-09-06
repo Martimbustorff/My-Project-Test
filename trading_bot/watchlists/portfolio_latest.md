@@ -1,6 +1,6 @@
 # 📈 Weekly Stock Watchlist — week of 2026-08-31
 
-*Generated 2026-09-06T22:17:17+00:00 · horizon ≤ 90 days (~3 months) · regions: US, EU*
+*Generated 2026-09-06T22:52:03+00:00 · horizon ≤ 90 days (~3 months) · regions: US, EU*
 
 Screened **7** American & European candidates; **7** qualified as growing stocks. Each list below ranks the qualifiers by a different lens.
 

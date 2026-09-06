@@ -1,6 +1,6 @@
 # 📈 Weekly Stock Watchlist — week of 2026-08-31
 
-*Generated 2026-09-06T22:17:14+00:00 · horizon ≤ 90 days (~3 months) · regions: US, EU*
+*Generated 2026-09-06T22:51:59+00:00 · horizon ≤ 90 days (~3 months) · regions: US, EU*
 
 Screened **138** American & European candidates; **105** qualified as growing stocks. Each list below ranks the qualifiers by a different lens.
 
@@ -42,9 +42,9 @@ Screened **138** American & European candidates; **105** qualified as growing st
 | 3 | `CRDO` | Credo Technology | US | 100 | +114.7% | $170.57 | $281.39 |
 | 4 | `ASTS` | AST SpaceMobile | US | 100 | +2626.6% | $62.31 | $79.61 |
 | 5 | `INVE-B.ST` | Investor AB | EU | 100 | +117.0% | kr 408.05 | kr 391.50 |
-| 6 | `ARGX.BR` | argenx | EU | 100 | +59.3% | €893.60 | €1,000.89 |
+| 6 | `ARGX.BR` | argenx | EU | 100 | +59.3% | €893.60 | €1,000.78 |
 | 7 | `RKLB` | Rocket Lab | US | 95 | +62.0% | $64.26 | $111.00 |
-| 8 | `PLTR` | Palantir Technologies | US | 91 | +92.8% | $174.33 | $191.68 |
+| 8 | `PLTR` | Palantir Technologies | US | 91 | +92.8% | $174.33 | $193.88 |
 | 9 | `APP` | AppLovin | US | 87 | +52.8% | $320.56 | $514.48 |
 | 10 | `AVGO` | Broadcom | US | 87 | +85.5% | $357.89 | $533.41 |
 
@@ -69,7 +69,6 @@ Screened **138** American & European candidates; **105** qualified as growing st
 | Symbol | Missing dimension(s) |
 |--------|----------------------|
 | `INVE-B.ST` | consensus |
-| `SMCI` | consensus |
 
 ---
 *Scores are 0–100. Composite weighting: 40% upside · 35% growth · 25% consensus. Source: yfinance (public data).*

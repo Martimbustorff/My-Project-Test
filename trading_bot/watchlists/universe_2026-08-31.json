@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-06T22:17:14+00:00",
+  "generated_at": "2026-09-06T22:51:59+00:00",
   "week_of": "2026-08-31",
   "horizon_days": 90,
   "regions": [
@@ -440,21 +440,19 @@
       "name": "Super Micro Computer",
       "region": "US",
       "exchange": "Nasdaq",
-      "composite_score": 64.54,
+      "composite_score": 65.52,
       "upside_score": 42.59,
       "growth_score": 100.0,
-      "consensus_score": 50.0,
+      "consensus_score": 53.95,
       "upside_pct": 0.07034604698156088,
       "revenue_growth": 0.932,
-      "recommendation_key": "none",
+      "recommendation_key": "hold",
       "price_change_3m": -0.04923149056457887,
       "current_price": 39.59,
       "target_mean_price": 42.375,
       "currency": "USD",
-      "data_coverage": 2,
-      "missing_dimensions": [
-        "consensus"
-      ]
+      "data_coverage": 3,
+      "missing_dimensions": []
     },
     {
       "rank": 3,
@@ -524,16 +522,16 @@
       "name": "argenx",
       "region": "EU",
       "exchange": "Euronext Brussels",
-      "composite_score": 79.51,
-      "upside_score": 55.02,
+      "composite_score": 79.49,
+      "upside_score": 54.98,
       "growth_score": 100.0,
       "consensus_score": 90.0,
-      "upside_pct": 0.120068542972247,
+      "upside_pct": 0.11993849597135187,
       "revenue_growth": 0.593,
       "recommendation_key": "strong_buy",
       "price_change_3m": 0.22612512424984255,
       "current_price": 893.6,
-      "target_mean_price": 1000.89325,
+      "target_mean_price": 1000.77704,
       "currency": "EUR",
       "data_coverage": 3,
       "missing_dimensions": []
@@ -564,16 +562,16 @@
       "name": "Palantir Technologies",
       "region": "US",
       "exchange": "NYSE",
-      "composite_score": 71.89,
-      "upside_score": 49.88,
+      "composite_score": 73.15,
+      "upside_score": 53.03,
       "growth_score": 91.46,
       "consensus_score": 79.69,
-      "upside_pct": 0.09952389147020013,
+      "upside_pct": 0.11213090116445823,
       "revenue_growth": 0.928,
       "recommendation_key": "buy",
       "price_change_3m": 0.28628350476813247,
       "current_price": 174.33,
-      "target_mean_price": 191.68,
+      "target_mean_price": 193.87778,
       "currency": "USD",
       "data_coverage": 3,
       "missing_dimensions": []
@@ -957,7 +955,7 @@
     {
       "rank": 23,
       "symbol": "ARGX.BR",
-      "composite_score": 79.51,
+      "composite_score": 79.49,
       "data_coverage": 3
     },
     {
@@ -1034,20 +1032,20 @@
     },
     {
       "rank": 36,
+      "symbol": "PLTR",
+      "composite_score": 73.15,
+      "data_coverage": 3
+    },
+    {
+      "rank": 37,
       "symbol": "LRCX",
       "composite_score": 73.09,
       "data_coverage": 3
     },
     {
-      "rank": 37,
+      "rank": 38,
       "symbol": "ADYEN.AS",
       "composite_score": 72.35,
-      "data_coverage": 3
-    },
-    {
-      "rank": 38,
-      "symbol": "PLTR",
-      "composite_score": 71.89,
       "data_coverage": 3
     },
     {
@@ -1071,7 +1069,7 @@
     {
       "rank": 42,
       "symbol": "DASH",
-      "composite_score": 71.09,
+      "composite_score": 70.89,
       "data_coverage": 3
     },
     {
@@ -1107,7 +1105,7 @@
     {
       "rank": 48,
       "symbol": "TOST",
-      "composite_score": 68.29,
+      "composite_score": 68.49,
       "data_coverage": 3
     },
     {
@@ -1142,21 +1140,21 @@
     },
     {
       "rank": 54,
+      "symbol": "SMCI",
+      "composite_score": 65.52,
+      "data_coverage": 3
+    },
+    {
+      "rank": 55,
       "symbol": "MSFT",
       "composite_score": 64.9,
       "data_coverage": 3
     },
     {
-      "rank": 55,
+      "rank": 56,
       "symbol": "RBLX",
       "composite_score": 64.56,
       "data_coverage": 3
-    },
-    {
-      "rank": 56,
-      "symbol": "SMCI",
-      "composite_score": 64.54,
-      "data_coverage": 2
     },
     {
       "rank": 57,
@@ -1166,44 +1164,44 @@
     },
     {
       "rank": 58,
-      "symbol": "INTU",
-      "composite_score": 64.3,
-      "data_coverage": 3
-    },
-    {
-      "rank": 59,
       "symbol": "ZAL.DE",
       "composite_score": 64.3,
       "data_coverage": 2
     },
     {
-      "rank": 60,
+      "rank": 59,
       "symbol": "SOFI",
       "composite_score": 64.27,
       "data_coverage": 3
     },
     {
-      "rank": 61,
+      "rank": 60,
       "symbol": "ABI.BR",
-      "composite_score": 63.55,
+      "composite_score": 63.53,
       "data_coverage": 3
     },
     {
-      "rank": 62,
+      "rank": 61,
       "symbol": "NFLX",
       "composite_score": 63.16,
       "data_coverage": 3
     },
     {
+      "rank": 62,
+      "symbol": "INTU",
+      "composite_score": 62.47,
+      "data_coverage": 3
+    },
+    {
       "rank": 63,
-      "symbol": "HOOD",
-      "composite_score": 62.98,
+      "symbol": "SAN.PA",
+      "composite_score": 61.63,
       "data_coverage": 3
     },
     {
       "rank": 64,
-      "symbol": "SAN.PA",
-      "composite_score": 61.63,
+      "symbol": "HOOD",
+      "composite_score": 61.28,
       "data_coverage": 3
     },
     {
@@ -1262,20 +1260,20 @@
     },
     {
       "rank": 74,
-      "symbol": "GTLB",
-      "composite_score": 55.99,
-      "data_coverage": 3
-    },
-    {
-      "rank": 75,
       "symbol": "TEAM",
       "composite_score": 54.91,
       "data_coverage": 3
     },
     {
-      "rank": 76,
+      "rank": 75,
       "symbol": "NOKIA.HE",
       "composite_score": 53.59,
+      "data_coverage": 3
+    },
+    {
+      "rank": 76,
+      "symbol": "GTLB",
+      "composite_score": 53.4,
       "data_coverage": 3
     },
     {
@@ -1413,7 +1411,7 @@
     {
       "rank": 99,
       "symbol": "HSBA.L",
-      "composite_score": 39.9,
+      "composite_score": 39.89,
       "data_coverage": 3
     },
     {
