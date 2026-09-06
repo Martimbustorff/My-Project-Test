@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-06T21:58:50+00:00",
+  "generated_at": "2026-09-06T22:17:14+00:00",
   "week_of": "2026-08-31",
   "horizon_days": 90,
   "regions": [
@@ -524,16 +524,16 @@
       "name": "argenx",
       "region": "EU",
       "exchange": "Euronext Brussels",
-      "composite_score": 79.52,
-      "upside_score": 55.05,
+      "composite_score": 79.51,
+      "upside_score": 55.02,
       "growth_score": 100.0,
       "consensus_score": 90.0,
-      "upside_pct": 0.12019863473589965,
+      "upside_pct": 0.120068542972247,
       "revenue_growth": 0.593,
       "recommendation_key": "strong_buy",
       "price_change_3m": 0.22612512424984255,
       "current_price": 893.6,
-      "target_mean_price": 1001.0095,
+      "target_mean_price": 1000.89325,
       "currency": "EUR",
       "data_coverage": 3,
       "missing_dimensions": []
@@ -957,7 +957,7 @@
     {
       "rank": 23,
       "symbol": "ARGX.BR",
-      "composite_score": 79.52,
+      "composite_score": 79.51,
       "data_coverage": 3
     },
     {
@@ -1185,7 +1185,7 @@
     {
       "rank": 61,
       "symbol": "ABI.BR",
-      "composite_score": 63.56,
+      "composite_score": 63.55,
       "data_coverage": 3
     },
     {
@@ -1221,7 +1221,7 @@
     {
       "rank": 67,
       "symbol": "SHEL.L",
-      "composite_score": 60.48,
+      "composite_score": 60.47,
       "data_coverage": 3
     },
     {
@@ -1436,14 +1436,14 @@
     },
     {
       "rank": 103,
-      "symbol": "BBVA.MC",
-      "composite_score": 31.74,
+      "symbol": "DUOL",
+      "composite_score": 31.51,
       "data_coverage": 3
     },
     {
       "rank": 104,
-      "symbol": "DUOL",
-      "composite_score": 31.51,
+      "symbol": "BBVA.MC",
+      "composite_score": 31.2,
       "data_coverage": 3
     },
     {
