@@ -1,6 +1,6 @@
 # 📈 Weekly Stock Watchlist — week of 2026-09-07
 
-*Generated 2026-09-07T13:59:10+00:00 · horizon ≤ 90 days (~3 months) · regions: US, EU*
+*Generated 2026-09-07T23:13:57+00:00 · horizon ≤ 90 days (~3 months) · regions: US, EU*
 
 Screened **7** American & European candidates; **7** qualified as growing stocks. Each list below ranks the qualifiers by a different lens.
 
@@ -17,7 +17,7 @@ _No entries, exits or rank changes since the last run._
 | 2 | `RKLB` | RKLB | US | 94.6 | 100 | 95 | 86 | -41.6% | ✅ 3/3 |
 | 3 | `KRMN` | KRMN | US | 92.1 | 100 | 89 | 84 | -19.1% | ✅ 3/3 |
 | 4 | `SEZL` | SEZL | US | 87.5 | 100 | 100 | 50 | +3.9% | ⚠️ 2/3 |
-| 5 | `THEON.AS` | THEON.AS | EU | 75.0 | 82 | 85 | 50 | +4.1% | ⚠️ 2/3 |
+| 5 | `THEON.AS` | THEON.AS | EU | 74.8 | 81 | 85 | 50 | +1.3% | ⚠️ 2/3 |
 | 6 | `NVMI` | NVMI | US | 66.0 | 100 | 39 | 50 | -21.8% | ⚠️ 2/3 |
 | 7 | `DAVE` | DAVE | US | 66.0 | 62 | 58 | 85 | +47.4% | ✅ 3/3 |
 
@@ -29,7 +29,7 @@ _No entries, exits or rank changes since the last run._
 | 3 | `NVMI` | NVMI | US | 100 | +43.0% | $372.10 | $532.00 |
 | 4 | `RKLB` | RKLB | US | 100 | +72.7% | $64.26 | $111.00 |
 | 5 | `SEZL` | SEZL | US | 100 | +39.3% | $120.58 | $168.00 |
-| 6 | `THEON.AS` | THEON.AS | EU | 82 | +22.7% | €32.54 | €39.91 |
+| 6 | `THEON.AS` | THEON.AS | EU | 81 | +22.5% | €32.58 | €39.91 |
 | 7 | `DAVE` | DAVE | US | 62 | +14.7% | $380.69 | $436.58 |
 
 ## 📊 Financial Growth History (revenue growth)
@@ -39,7 +39,7 @@ _No entries, exits or rank changes since the last run._
 | 2 | `SEZL` | SEZL | US | 100 | +51.7% | $120.58 | $168.00 |
 | 3 | `RKLB` | RKLB | US | 95 | +62.0% | $64.26 | $111.00 |
 | 4 | `KRMN` | KRMN | US | 89 | +58.2% | $39.98 | $87.10 |
-| 5 | `THEON.AS` | THEON.AS | EU | 85 | +32.2% | €32.54 | €39.91 |
+| 5 | `THEON.AS` | THEON.AS | EU | 85 | +32.2% | €32.58 | €39.91 |
 | 6 | `DAVE` | DAVE | US | 58 | +29.6% | $380.69 | $436.58 |
 | 7 | `NVMI` | NVMI | US | 39 | +15.9% | $372.10 | $532.00 |
 
@@ -52,7 +52,7 @@ _No entries, exits or rank changes since the last run._
 | 4 | `KRMN` | KRMN | US | 84 | Buy | $39.98 | $87.10 |
 | 5 | `NVMI` | NVMI | US | 50 | None | $372.10 | $532.00 |
 | 6 | `SEZL` | SEZL | US | 50 | None | $120.58 | $168.00 |
-| 7 | `THEON.AS` | THEON.AS | EU | 50 | None | €32.54 | €39.91 |
+| 7 | `THEON.AS` | THEON.AS | EU | 50 | None | €32.58 | €39.91 |
 
 ## 🔍 Data quality
 

@@ -1,6 +1,6 @@
 # 📈 Weekly Stock Watchlist — week of 2026-09-07
 
-*Generated 2026-09-07T13:59:07+00:00 · horizon ≤ 90 days (~3 months) · regions: US, EU*
+*Generated 2026-09-07T23:13:55+00:00 · horizon ≤ 90 days (~3 months) · regions: US, EU*
 
 Screened **138** American & European candidates; **105** qualified as growing stocks. Each list below ranks the qualifiers by a different lens.
 
@@ -12,11 +12,11 @@ Screened **138** American & European candidates; **105** qualified as growing st
 
 | Symbol | Was | Now | Move |
 |--------|----:|----:|:-----|
-| `NOKIA.HE` | 75 | 89 | 🔻 14 |
+| `NOKIA.HE` | 75 | 90 | 🔻 15 |
 | `ARGX.BR` | 23 | 15 | 🔺 8 |
-| `ENEL.MI` | 84 | 77 | 🔺 7 |
 | `ABI.BR` | 60 | 54 | 🔺 6 |
 | `SU.PA` | 69 | 75 | 🔻 6 |
+| `SIE.DE` | 83 | 78 | 🔺 5 |
 
 ## 🏆 Top Overall (composite)
 | # | Symbol | Name | Region | Composite | Upside | Growth | Consensus | 3M Trend | Data |
@@ -53,8 +53,8 @@ Screened **138** American & European candidates; **105** qualified as growing st
 | 2 | `SMCI` | Super Micro Computer | US | 100 | +93.2% | $39.59 | $42.38 |
 | 3 | `CRDO` | Credo Technology | US | 100 | +114.7% | $170.57 | $281.39 |
 | 4 | `ASTS` | AST SpaceMobile | US | 100 | +2626.6% | $62.31 | $79.61 |
-| 5 | `INVE-B.ST` | Investor AB | EU | 100 | +117.0% | kr 407.40 | kr 391.50 |
-| 6 | `ARGX.BR` | argenx | EU | 100 | +59.3% | €866.60 | €999.50 |
+| 5 | `INVE-B.ST` | Investor AB | EU | 100 | +117.0% | kr 405.65 | kr 391.50 |
+| 6 | `ARGX.BR` | argenx | EU | 100 | +59.3% | €869.40 | €999.61 |
 | 7 | `RKLB` | Rocket Lab | US | 95 | +62.0% | $64.26 | $111.00 |
 | 8 | `PLTR` | Palantir Technologies | US | 91 | +92.8% | $174.33 | $193.88 |
 | 9 | `APP` | AppLovin | US | 87 | +52.8% | $320.56 | $514.48 |
@@ -63,11 +63,11 @@ Screened **138** American & European candidates; **105** qualified as growing st
 ## 👥 Analyst Consensus
 | # | Symbol | Name | Region | Consensus Score | Detail | Price | Target |
 |---|--------|------|--------|------------:|-------:|------:|-------:|
-| 1 | `BC8.DE` | Bechtle | EU | 94 | Strong Buy | €35.64 | €43.43 |
+| 1 | `BC8.DE` | Bechtle | EU | 94 | Strong Buy | €35.74 | €43.43 |
 | 2 | `ANET` | Arista Networks | US | 94 | Strong Buy | $193.78 | $241.04 |
 | 3 | `AVGO` | Broadcom | US | 93 | Strong Buy | $357.89 | $533.41 |
 | 4 | `NVDA` | NVIDIA | US | 93 | Strong Buy | $230.36 | $327.13 |
-| 5 | `DSV.CO` | DSV | EU | 92 | Strong Buy | kr 1,330.00 | kr 2,003.50 |
+| 5 | `DSV.CO` | DSV | EU | 92 | Strong Buy | kr 1,325.00 | kr 2,003.50 |
 | 6 | `AMZN` | Amazon | US | 92 | Strong Buy | $258.51 | $328.17 |
 | 7 | `CRDO` | Credo Technology | US | 92 | Strong Buy | $170.57 | $281.39 |
 | 8 | `MU` | Micron Technology | US | 91 | Strong Buy | $1,016.59 | $1,513.11 |
