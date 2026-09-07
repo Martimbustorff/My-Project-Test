@@ -1,0 +1,1456 @@
+{
+  "generated_at": "2026-09-07T13:59:07+00:00",
+  "week_of": "2026-09-07",
+  "horizon_days": 90,
+  "regions": [
+    "US",
+    "EU"
+  ],
+  "universe_size": 138,
+  "qualified_count": 105,
+  "failed_symbols": [],
+  "top_overall": [
+    {
+      "rank": 1,
+      "symbol": "NVDA",
+      "name": "NVIDIA",
+      "region": "US",
+      "exchange": "Nasdaq",
+      "composite_score": 98.23,
+      "upside_score": 100.0,
+      "growth_score": 100.0,
+      "consensus_score": 92.92,
+      "upside_pct": 0.42007327661052263,
+      "revenue_growth": 1.059,
+      "recommendation_key": "strong_buy",
+      "price_change_3m": 0.12315940397430802,
+      "current_price": 230.36,
+      "target_mean_price": 327.12808,
+      "currency": "USD",
+      "data_coverage": 3,
+      "missing_dimensions": []
+    },
+    {
+      "rank": 2,
+      "symbol": "CRDO",
+      "name": "Credo Technology",
+      "region": "US",
+      "exchange": "Nasdaq",
+      "composite_score": 98.03,
+      "upside_score": 100.0,
+      "growth_score": 100.0,
+      "consensus_score": 92.11,
+      "upside_pct": 0.6497163627836078,
+      "revenue_growth": 1.147,
+      "recommendation_key": "strong_buy",
+      "price_change_3m": -0.17555218798674777,
+      "current_price": 170.57,
+      "target_mean_price": 281.39212,
+      "currency": "USD",
+      "data_coverage": 3,
+      "missing_dimensions": []
+    },
+    {
+      "rank": 3,
+      "symbol": "RKLB",
+      "name": "Rocket Lab",
+      "region": "US",
+      "exchange": "Nasdaq",
+      "composite_score": 94.59,
+      "upside_score": 100.0,
+      "growth_score": 94.89,
+      "consensus_score": 85.53,
+      "upside_pct": 0.7273576097105507,
+      "revenue_growth": 0.62,
+      "recommendation_key": "buy",
+      "price_change_3m": -0.4162427228621096,
+      "current_price": 64.26,
+      "target_mean_price": 111.0,
+      "currency": "USD",
+      "data_coverage": 3,
+      "missing_dimensions": []
+    },
+    {
+      "rank": 4,
+      "symbol": "AVGO",
+      "name": "Broadcom",
+      "region": "US",
+      "exchange": "Nasdaq",
+      "composite_score": 93.86,
+      "upside_score": 100.0,
+      "growth_score": 87.19,
+      "consensus_score": 93.37,
+      "upside_pct": 0.49040556587826023,
+      "revenue_growth": 0.855,
+      "recommendation_key": "strong_buy",
+      "price_change_3m": -0.0706804511194783,
+      "current_price": 357.895,
+      "target_mean_price": 533.4087,
+      "currency": "USD",
+      "data_coverage": 3,
+      "missing_dimensions": []
+    },
+    {
+      "rank": 5,
+      "symbol": "APP",
+      "name": "AppLovin",
+      "region": "US",
+      "exchange": "Nasdaq",
+      "composite_score": 91.81,
+      "upside_score": 100.0,
+      "growth_score": 87.42,
+      "consensus_score": 84.85,
+      "upside_pct": 0.6049535188420263,
+      "revenue_growth": 0.528,
+      "recommendation_key": "buy",
+      "price_change_3m": -0.42469492007209864,
+      "current_price": 320.56,
+      "target_mean_price": 514.4839,
+      "currency": "USD",
+      "data_coverage": 3,
+      "missing_dimensions": []
+    },
+    {
+      "rank": 6,
+      "symbol": "MU",
+      "name": "Micron Technology",
+      "region": "US",
+      "exchange": "Nasdaq",
+      "composite_score": 90.21,
+      "upside_score": 100.0,
+      "growth_score": 78.36,
+      "consensus_score": 91.15,
+      "upside_pct": 0.4884182413755791,
+      "revenue_growth": 3.457,
+      "recommendation_key": "strong_buy",
+      "price_change_3m": 0.17677616899477555,
+      "current_price": 1016.59,
+      "target_mean_price": 1513.1111,
+      "currency": "USD",
+      "data_coverage": 3,
+      "missing_dimensions": []
+    },
+    {
+      "rank": 7,
+      "symbol": "AMD",
+      "name": "Advanced Micro Devices",
+      "region": "US",
+      "exchange": "Nasdaq",
+      "composite_score": 89.16,
+      "upside_score": 96.34,
+      "growth_score": 81.82,
+      "consensus_score": 87.96,
+      "upside_pct": 0.28535062922712906,
+      "revenue_growth": 0.501,
+      "recommendation_key": "strong_buy",
+      "price_change_3m": 0.02399331515985126,
+      "current_price": 477.57,
+      "target_mean_price": 613.8449,
+      "currency": "USD",
+      "data_coverage": 3,
+      "missing_dimensions": []
+    },
+    {
+      "rank": 8,
+      "symbol": "DDOG",
+      "name": "Datadog",
+      "region": "US",
+      "exchange": "Nasdaq",
+      "composite_score": 88.77,
+      "upside_score": 100.0,
+      "growth_score": 76.47,
+      "consensus_score": 88.04,
+      "upside_pct": 0.3393143286526088,
+      "revenue_growth": 0.356,
+      "recommendation_key": "strong_buy",
+      "price_change_3m": -0.09047032539981892,
+      "current_price": 212.93,
+      "target_mean_price": 285.1802,
+      "currency": "USD",
+      "data_coverage": 3,
+      "missing_dimensions": []
+    },
+    {
+      "rank": 9,
+      "symbol": "AFRM",
+      "name": "Affirm Holdings",
+      "region": "US",
+      "exchange": "Nasdaq",
+      "composite_score": 88.7,
+      "upside_score": 100.0,
+      "growth_score": 80.31,
+      "consensus_score": 82.35,
+      "upside_pct": 0.37157332411886657,
+      "revenue_growth": 0.33,
+      "recommendation_key": "buy",
+      "price_change_3m": 0.13739974500719043,
+      "current_price": 72.35,
+      "target_mean_price": 99.23333,
+      "currency": "USD",
+      "data_coverage": 3,
+      "missing_dimensions": []
+    },
+    {
+      "rank": 10,
+      "symbol": "ASTS",
+      "name": "AST SpaceMobile",
+      "region": "US",
+      "exchange": "Nasdaq",
+      "composite_score": 87.94,
+      "upside_score": 94.4,
+      "growth_score": 100.0,
+      "consensus_score": 60.71,
+      "upside_pct": 0.27761723639865177,
+      "revenue_growth": 26.266,
+      "recommendation_key": "hold",
+      "price_change_3m": -0.3342948462705506,
+      "current_price": 62.31,
+      "target_mean_price": 79.60833,
+      "currency": "USD",
+      "data_coverage": 3,
+      "missing_dimensions": []
+    }
+  ],
+  "by_upside": [
+    {
+      "rank": 1,
+      "symbol": "NVDA",
+      "name": "NVIDIA",
+      "region": "US",
+      "exchange": "Nasdaq",
+      "composite_score": 98.23,
+      "upside_score": 100.0,
+      "growth_score": 100.0,
+      "consensus_score": 92.92,
+      "upside_pct": 0.42007327661052263,
+      "revenue_growth": 1.059,
+      "recommendation_key": "strong_buy",
+      "price_change_3m": 0.12315940397430802,
+      "current_price": 230.36,
+      "target_mean_price": 327.12808,
+      "currency": "USD",
+      "data_coverage": 3,
+      "missing_dimensions": []
+    },
+    {
+      "rank": 2,
+      "symbol": "AVGO",
+      "name": "Broadcom",
+      "region": "US",
+      "exchange": "Nasdaq",
+      "composite_score": 93.86,
+      "upside_score": 100.0,
+      "growth_score": 87.19,
+      "consensus_score": 93.37,
+      "upside_pct": 0.49040556587826023,
+      "revenue_growth": 0.855,
+      "recommendation_key": "strong_buy",
+      "price_change_3m": -0.0706804511194783,
+      "current_price": 357.895,
+      "target_mean_price": 533.4087,
+      "currency": "USD",
+      "data_coverage": 3,
+      "missing_dimensions": []
+    },
+    {
+      "rank": 3,
+      "symbol": "ORCL",
+      "name": "Oracle",
+      "region": "US",
+      "exchange": "NYSE",
+      "composite_score": 77.54,
+      "upside_score": 100.0,
+      "growth_score": 46.37,
+      "consensus_score": 85.23,
+      "upside_pct": 0.5244123315279001,
+      "revenue_growth": 0.206,
+      "recommendation_key": "buy",
+      "price_change_3m": -0.2543410755947145,
+      "current_price": 158.78,
+      "target_mean_price": 242.04619,
+      "currency": "USD",
+      "data_coverage": 3,
+      "missing_dimensions": []
+    },
+    {
+      "rank": 4,
+      "symbol": "AMAT",
+      "name": "Applied Materials",
+      "region": "US",
+      "exchange": "Nasdaq",
+      "composite_score": 80.74,
+      "upside_score": 100.0,
+      "growth_score": 53.22,
+      "consensus_score": 88.46,
+      "upside_pct": 0.40943832332695584,
+      "revenue_growth": 0.248,
+      "recommendation_key": "strong_buy",
+      "price_change_3m": 0.004825949921960504,
+      "current_price": 454.71,
+      "target_mean_price": 640.8857,
+      "currency": "USD",
+      "data_coverage": 3,
+      "missing_dimensions": []
+    },
+    {
+      "rank": 5,
+      "symbol": "DDOG",
+      "name": "Datadog",
+      "region": "US",
+      "exchange": "Nasdaq",
+      "composite_score": 88.77,
+      "upside_score": 100.0,
+      "growth_score": 76.47,
+      "consensus_score": 88.04,
+      "upside_pct": 0.3393143286526088,
+      "revenue_growth": 0.356,
+      "recommendation_key": "strong_buy",
+      "price_change_3m": -0.09047032539981892,
+      "current_price": 212.93,
+      "target_mean_price": 285.1802,
+      "currency": "USD",
+      "data_coverage": 3,
+      "missing_dimensions": []
+    },
+    {
+      "rank": 6,
+      "symbol": "UBER",
+      "name": "Uber Technologies",
+      "region": "US",
+      "exchange": "NYSE",
+      "composite_score": 80.14,
+      "upside_score": 100.0,
+      "growth_score": 52.37,
+      "consensus_score": 87.25,
+      "upside_pct": 0.3438462249208025,
+      "revenue_growth": 0.122,
+      "recommendation_key": "buy",
+      "price_change_3m": 0.07141851388973852,
+      "current_price": 75.76,
+      "target_mean_price": 101.80979,
+      "currency": "USD",
+      "data_coverage": 3,
+      "missing_dimensions": []
+    },
+    {
+      "rank": 7,
+      "symbol": "MU",
+      "name": "Micron Technology",
+      "region": "US",
+      "exchange": "Nasdaq",
+      "composite_score": 90.21,
+      "upside_score": 100.0,
+      "growth_score": 78.36,
+      "consensus_score": 91.15,
+      "upside_pct": 0.4884182413755791,
+      "revenue_growth": 3.457,
+      "recommendation_key": "strong_buy",
+      "price_change_3m": 0.17677616899477555,
+      "current_price": 1016.59,
+      "target_mean_price": 1513.1111,
+      "currency": "USD",
+      "data_coverage": 3,
+      "missing_dimensions": []
+    },
+    {
+      "rank": 8,
+      "symbol": "CRDO",
+      "name": "Credo Technology",
+      "region": "US",
+      "exchange": "Nasdaq",
+      "composite_score": 98.03,
+      "upside_score": 100.0,
+      "growth_score": 100.0,
+      "consensus_score": 92.11,
+      "upside_pct": 0.6497163627836078,
+      "revenue_growth": 1.147,
+      "recommendation_key": "strong_buy",
+      "price_change_3m": -0.17555218798674777,
+      "current_price": 170.57,
+      "target_mean_price": 281.39212,
+      "currency": "USD",
+      "data_coverage": 3,
+      "missing_dimensions": []
+    },
+    {
+      "rank": 9,
+      "symbol": "APP",
+      "name": "AppLovin",
+      "region": "US",
+      "exchange": "Nasdaq",
+      "composite_score": 91.81,
+      "upside_score": 100.0,
+      "growth_score": 87.42,
+      "consensus_score": 84.85,
+      "upside_pct": 0.6049535188420263,
+      "revenue_growth": 0.528,
+      "recommendation_key": "buy",
+      "price_change_3m": -0.42469492007209864,
+      "current_price": 320.56,
+      "target_mean_price": 514.4839,
+      "currency": "USD",
+      "data_coverage": 3,
+      "missing_dimensions": []
+    },
+    {
+      "rank": 10,
+      "symbol": "CAVA",
+      "name": "CAVA Group",
+      "region": "US",
+      "exchange": "NYSE",
+      "composite_score": 81.35,
+      "upside_score": 100.0,
+      "growth_score": 63.29,
+      "consensus_score": 76.79,
+      "upside_pct": 0.39551793943383795,
+      "revenue_growth": 0.313,
+      "recommendation_key": "buy",
+      "price_change_3m": -0.1630854049784638,
+      "current_price": 60.76,
+      "target_mean_price": 84.79167,
+      "currency": "USD",
+      "data_coverage": 3,
+      "missing_dimensions": []
+    }
+  ],
+  "by_growth": [
+    {
+      "rank": 1,
+      "symbol": "NVDA",
+      "name": "NVIDIA",
+      "region": "US",
+      "exchange": "Nasdaq",
+      "composite_score": 98.23,
+      "upside_score": 100.0,
+      "growth_score": 100.0,
+      "consensus_score": 92.92,
+      "upside_pct": 0.42007327661052263,
+      "revenue_growth": 1.059,
+      "recommendation_key": "strong_buy",
+      "price_change_3m": 0.12315940397430802,
+      "current_price": 230.36,
+      "target_mean_price": 327.12808,
+      "currency": "USD",
+      "data_coverage": 3,
+      "missing_dimensions": []
+    },
+    {
+      "rank": 2,
+      "symbol": "SMCI",
+      "name": "Super Micro Computer",
+      "region": "US",
+      "exchange": "Nasdaq",
+      "composite_score": 64.54,
+      "upside_score": 42.59,
+      "growth_score": 100.0,
+      "consensus_score": 50.0,
+      "upside_pct": 0.07034604698156088,
+      "revenue_growth": 0.932,
+      "recommendation_key": "none",
+      "price_change_3m": -0.04923149056457887,
+      "current_price": 39.59,
+      "target_mean_price": 42.375,
+      "currency": "USD",
+      "data_coverage": 2,
+      "missing_dimensions": [
+        "consensus"
+      ]
+    },
+    {
+      "rank": 3,
+      "symbol": "CRDO",
+      "name": "Credo Technology",
+      "region": "US",
+      "exchange": "Nasdaq",
+      "composite_score": 98.03,
+      "upside_score": 100.0,
+      "growth_score": 100.0,
+      "consensus_score": 92.11,
+      "upside_pct": 0.6497163627836078,
+      "revenue_growth": 1.147,
+      "recommendation_key": "strong_buy",
+      "price_change_3m": -0.17555218798674777,
+      "current_price": 170.57,
+      "target_mean_price": 281.39212,
+      "currency": "USD",
+      "data_coverage": 3,
+      "missing_dimensions": []
+    },
+    {
+      "rank": 4,
+      "symbol": "ASTS",
+      "name": "AST SpaceMobile",
+      "region": "US",
+      "exchange": "Nasdaq",
+      "composite_score": 87.94,
+      "upside_score": 94.4,
+      "growth_score": 100.0,
+      "consensus_score": 60.71,
+      "upside_pct": 0.27761723639865177,
+      "revenue_growth": 26.266,
+      "recommendation_key": "hold",
+      "price_change_3m": -0.3342948462705506,
+      "current_price": 62.31,
+      "target_mean_price": 79.60833,
+      "currency": "USD",
+      "data_coverage": 3,
+      "missing_dimensions": []
+    },
+    {
+      "rank": 5,
+      "symbol": "INVE-B.ST",
+      "name": "Investor AB",
+      "region": "EU",
+      "exchange": "Nasdaq Stockholm",
+      "composite_score": 56.38,
+      "upside_score": 22.19,
+      "growth_score": 100.0,
+      "consensus_score": 50.0,
+      "upside_pct": -0.03902798232695137,
+      "revenue_growth": 1.17,
+      "recommendation_key": "none",
+      "price_change_3m": 0.07041510079660829,
+      "current_price": 407.4,
+      "target_mean_price": 391.5,
+      "currency": "SEK",
+      "data_coverage": 2,
+      "missing_dimensions": [
+        "consensus"
+      ]
+    },
+    {
+      "rank": 6,
+      "symbol": "ARGX.BR",
+      "name": "argenx",
+      "region": "EU",
+      "exchange": "Euronext Brussels",
+      "composite_score": 82.84,
+      "upside_score": 63.34,
+      "growth_score": 100.0,
+      "consensus_score": 90.0,
+      "upside_pct": 0.15335583891068527,
+      "revenue_growth": 0.593,
+      "recommendation_key": "strong_buy",
+      "price_change_3m": 0.13548213014291366,
+      "current_price": 866.6,
+      "target_mean_price": 999.49817,
+      "currency": "EUR",
+      "data_coverage": 3,
+      "missing_dimensions": []
+    },
+    {
+      "rank": 7,
+      "symbol": "RKLB",
+      "name": "Rocket Lab",
+      "region": "US",
+      "exchange": "Nasdaq",
+      "composite_score": 94.59,
+      "upside_score": 100.0,
+      "growth_score": 94.89,
+      "consensus_score": 85.53,
+      "upside_pct": 0.7273576097105507,
+      "revenue_growth": 0.62,
+      "recommendation_key": "buy",
+      "price_change_3m": -0.4162427228621096,
+      "current_price": 64.26,
+      "target_mean_price": 111.0,
+      "currency": "USD",
+      "data_coverage": 3,
+      "missing_dimensions": []
+    },
+    {
+      "rank": 8,
+      "symbol": "PLTR",
+      "name": "Palantir Technologies",
+      "region": "US",
+      "exchange": "NYSE",
+      "composite_score": 73.15,
+      "upside_score": 53.03,
+      "growth_score": 91.46,
+      "consensus_score": 79.69,
+      "upside_pct": 0.11213090116445823,
+      "revenue_growth": 0.928,
+      "recommendation_key": "buy",
+      "price_change_3m": 0.28628350476813247,
+      "current_price": 174.33,
+      "target_mean_price": 193.87778,
+      "currency": "USD",
+      "data_coverage": 3,
+      "missing_dimensions": []
+    },
+    {
+      "rank": 9,
+      "symbol": "APP",
+      "name": "AppLovin",
+      "region": "US",
+      "exchange": "Nasdaq",
+      "composite_score": 91.81,
+      "upside_score": 100.0,
+      "growth_score": 87.42,
+      "consensus_score": 84.85,
+      "upside_pct": 0.6049535188420263,
+      "revenue_growth": 0.528,
+      "recommendation_key": "buy",
+      "price_change_3m": -0.42469492007209864,
+      "current_price": 320.56,
+      "target_mean_price": 514.4839,
+      "currency": "USD",
+      "data_coverage": 3,
+      "missing_dimensions": []
+    },
+    {
+      "rank": 10,
+      "symbol": "AVGO",
+      "name": "Broadcom",
+      "region": "US",
+      "exchange": "Nasdaq",
+      "composite_score": 93.86,
+      "upside_score": 100.0,
+      "growth_score": 87.19,
+      "consensus_score": 93.37,
+      "upside_pct": 0.49040556587826023,
+      "revenue_growth": 0.855,
+      "recommendation_key": "strong_buy",
+      "price_change_3m": -0.0706804511194783,
+      "current_price": 357.895,
+      "target_mean_price": 533.4087,
+      "currency": "USD",
+      "data_coverage": 3,
+      "missing_dimensions": []
+    }
+  ],
+  "by_consensus": [
+    {
+      "rank": 1,
+      "symbol": "BC8.DE",
+      "name": "Bechtle",
+      "region": "EU",
+      "exchange": "Xetra",
+      "composite_score": 68.95,
+      "upside_score": 79.63,
+      "growth_score": 38.54,
+      "consensus_score": 94.44,
+      "upside_pct": 0.2185345117845119,
+      "revenue_growth": 0.165,
+      "recommendation_key": "strong_buy",
+      "price_change_3m": 0.10997504258276902,
+      "current_price": 35.64,
+      "target_mean_price": 43.42857,
+      "currency": "EUR",
+      "data_coverage": 3,
+      "missing_dimensions": []
+    },
+    {
+      "rank": 2,
+      "symbol": "ANET",
+      "name": "Arista Networks",
+      "region": "US",
+      "exchange": "NYSE",
+      "composite_score": 83.52,
+      "upside_score": 85.97,
+      "growth_score": 73.56,
+      "consensus_score": 93.55,
+      "upside_pct": 0.2438645371039323,
+      "revenue_growth": 0.377,
+      "recommendation_key": "strong_buy",
+      "price_change_3m": 0.25610937585155,
+      "current_price": 193.78,
+      "target_mean_price": 241.03607,
+      "currency": "USD",
+      "data_coverage": 3,
+      "missing_dimensions": []
+    },
+    {
+      "rank": 3,
+      "symbol": "AVGO",
+      "name": "Broadcom",
+      "region": "US",
+      "exchange": "Nasdaq",
+      "composite_score": 93.86,
+      "upside_score": 100.0,
+      "growth_score": 87.19,
+      "consensus_score": 93.37,
+      "upside_pct": 0.49040556587826023,
+      "revenue_growth": 0.855,
+      "recommendation_key": "strong_buy",
+      "price_change_3m": -0.0706804511194783,
+      "current_price": 357.895,
+      "target_mean_price": 533.4087,
+      "currency": "USD",
+      "data_coverage": 3,
+      "missing_dimensions": []
+    },
+    {
+      "rank": 4,
+      "symbol": "NVDA",
+      "name": "NVIDIA",
+      "region": "US",
+      "exchange": "Nasdaq",
+      "composite_score": 98.23,
+      "upside_score": 100.0,
+      "growth_score": 100.0,
+      "consensus_score": 92.92,
+      "upside_pct": 0.42007327661052263,
+      "revenue_growth": 1.059,
+      "recommendation_key": "strong_buy",
+      "price_change_3m": 0.12315940397430802,
+      "current_price": 230.36,
+      "target_mean_price": 327.12808,
+      "currency": "USD",
+      "data_coverage": 3,
+      "missing_dimensions": []
+    },
+    {
+      "rank": 5,
+      "symbol": "DSV.CO",
+      "name": "DSV",
+      "region": "EU",
+      "exchange": "Nasdaq Copenhagen",
+      "composite_score": 75.69,
+      "upside_score": 100.0,
+      "growth_score": 35.9,
+      "consensus_score": 92.5,
+      "upside_pct": 0.5063909774436091,
+      "revenue_growth": 0.237,
+      "recommendation_key": "strong_buy",
+      "price_change_3m": -0.16718847839699436,
+      "current_price": 1330.0,
+      "target_mean_price": 2003.5,
+      "currency": "DKK",
+      "data_coverage": 3,
+      "missing_dimensions": []
+    },
+    {
+      "rank": 6,
+      "symbol": "AMZN",
+      "name": "Amazon",
+      "region": "US",
+      "exchange": "Nasdaq",
+      "composite_score": 79.44,
+      "upside_score": 92.37,
+      "growth_score": 55.53,
+      "consensus_score": 92.21,
+      "upside_pct": 0.26947003984371976,
+      "revenue_growth": 0.196,
+      "recommendation_key": "strong_buy",
+      "price_change_3m": 0.05072556618399782,
+      "current_price": 258.51,
+      "target_mean_price": 328.1707,
+      "currency": "USD",
+      "data_coverage": 3,
+      "missing_dimensions": []
+    },
+    {
+      "rank": 7,
+      "symbol": "CRDO",
+      "name": "Credo Technology",
+      "region": "US",
+      "exchange": "Nasdaq",
+      "composite_score": 98.03,
+      "upside_score": 100.0,
+      "growth_score": 100.0,
+      "consensus_score": 92.11,
+      "upside_pct": 0.6497163627836078,
+      "revenue_growth": 1.147,
+      "recommendation_key": "strong_buy",
+      "price_change_3m": -0.17555218798674777,
+      "current_price": 170.57,
+      "target_mean_price": 281.39212,
+      "currency": "USD",
+      "data_coverage": 3,
+      "missing_dimensions": []
+    },
+    {
+      "rank": 8,
+      "symbol": "MU",
+      "name": "Micron Technology",
+      "region": "US",
+      "exchange": "Nasdaq",
+      "composite_score": 90.21,
+      "upside_score": 100.0,
+      "growth_score": 78.36,
+      "consensus_score": 91.15,
+      "upside_pct": 0.4884182413755791,
+      "revenue_growth": 3.457,
+      "recommendation_key": "strong_buy",
+      "price_change_3m": 0.17677616899477555,
+      "current_price": 1016.59,
+      "target_mean_price": 1513.1111,
+      "currency": "USD",
+      "data_coverage": 3,
+      "missing_dimensions": []
+    },
+    {
+      "rank": 9,
+      "symbol": "META",
+      "name": "Meta Platforms",
+      "region": "US",
+      "exchange": "Nasdaq",
+      "composite_score": 71.47,
+      "upside_score": 80.94,
+      "growth_score": 46.61,
+      "consensus_score": 91.13,
+      "upside_pct": 0.22375285762926223,
+      "revenue_growth": 0.28,
+      "recommendation_key": "strong_buy",
+      "price_change_3m": 0.04104828038648711,
+      "current_price": 616.77,
+      "target_mean_price": 754.77405,
+      "currency": "USD",
+      "data_coverage": 3,
+      "missing_dimensions": []
+    },
+    {
+      "rank": 10,
+      "symbol": "MSFT",
+      "name": "Microsoft",
+      "region": "US",
+      "exchange": "Nasdaq",
+      "composite_score": 64.9,
+      "upside_score": 61.63,
+      "growth_score": 50.05,
+      "consensus_score": 90.91,
+      "upside_pct": 0.1465182309385631,
+      "revenue_growth": 0.177,
+      "recommendation_key": "strong_buy",
+      "price_change_3m": 0.2015280836479112,
+      "current_price": 499.7,
+      "target_mean_price": 572.91516,
+      "currency": "USD",
+      "data_coverage": 3,
+      "missing_dimensions": []
+    }
+  ],
+  "all_ranked": [
+    {
+      "rank": 1,
+      "symbol": "NVDA",
+      "composite_score": 98.23,
+      "data_coverage": 3
+    },
+    {
+      "rank": 2,
+      "symbol": "CRDO",
+      "composite_score": 98.03,
+      "data_coverage": 3
+    },
+    {
+      "rank": 3,
+      "symbol": "RKLB",
+      "composite_score": 94.59,
+      "data_coverage": 3
+    },
+    {
+      "rank": 4,
+      "symbol": "AVGO",
+      "composite_score": 93.86,
+      "data_coverage": 3
+    },
+    {
+      "rank": 5,
+      "symbol": "APP",
+      "composite_score": 91.81,
+      "data_coverage": 3
+    },
+    {
+      "rank": 6,
+      "symbol": "MU",
+      "composite_score": 90.21,
+      "data_coverage": 3
+    },
+    {
+      "rank": 7,
+      "symbol": "AMD",
+      "composite_score": 89.16,
+      "data_coverage": 3
+    },
+    {
+      "rank": 8,
+      "symbol": "DDOG",
+      "composite_score": 88.77,
+      "data_coverage": 3
+    },
+    {
+      "rank": 9,
+      "symbol": "AFRM",
+      "composite_score": 88.7,
+      "data_coverage": 3
+    },
+    {
+      "rank": 10,
+      "symbol": "ASTS",
+      "composite_score": 87.94,
+      "data_coverage": 3
+    },
+    {
+      "rank": 11,
+      "symbol": "IOT",
+      "composite_score": 85.83,
+      "data_coverage": 3
+    },
+    {
+      "rank": 12,
+      "symbol": "RHM.DE",
+      "composite_score": 84.53,
+      "data_coverage": 3
+    },
+    {
+      "rank": 13,
+      "symbol": "BESI.AS",
+      "composite_score": 84.41,
+      "data_coverage": 3
+    },
+    {
+      "rank": 14,
+      "symbol": "ANET",
+      "composite_score": 83.52,
+      "data_coverage": 3
+    },
+    {
+      "rank": 15,
+      "symbol": "ARGX.BR",
+      "composite_score": 82.84,
+      "data_coverage": 3
+    },
+    {
+      "rank": 16,
+      "symbol": "PRX.AS",
+      "composite_score": 81.48,
+      "data_coverage": 3
+    },
+    {
+      "rank": 17,
+      "symbol": "CAVA",
+      "composite_score": 81.35,
+      "data_coverage": 3
+    },
+    {
+      "rank": 18,
+      "symbol": "AXON",
+      "composite_score": 81.23,
+      "data_coverage": 3
+    },
+    {
+      "rank": 19,
+      "symbol": "AMAT",
+      "composite_score": 80.74,
+      "data_coverage": 3
+    },
+    {
+      "rank": 20,
+      "symbol": "ASML.AS",
+      "composite_score": 80.62,
+      "data_coverage": 3
+    },
+    {
+      "rank": 21,
+      "symbol": "UBER",
+      "composite_score": 80.14,
+      "data_coverage": 3
+    },
+    {
+      "rank": 22,
+      "symbol": "GOOGL",
+      "composite_score": 80.11,
+      "data_coverage": 3
+    },
+    {
+      "rank": 23,
+      "symbol": "SNOW",
+      "composite_score": 80.0,
+      "data_coverage": 3
+    },
+    {
+      "rank": 24,
+      "symbol": "AMZN",
+      "composite_score": 79.44,
+      "data_coverage": 3
+    },
+    {
+      "rank": 25,
+      "symbol": "ONON",
+      "composite_score": 79.19,
+      "data_coverage": 3
+    },
+    {
+      "rank": 26,
+      "symbol": "ORCL",
+      "composite_score": 77.54,
+      "data_coverage": 3
+    },
+    {
+      "rank": 27,
+      "symbol": "CELH",
+      "composite_score": 76.82,
+      "data_coverage": 3
+    },
+    {
+      "rank": 28,
+      "symbol": "MDB",
+      "composite_score": 76.61,
+      "data_coverage": 3
+    },
+    {
+      "rank": 29,
+      "symbol": "DSV.CO",
+      "composite_score": 75.69,
+      "data_coverage": 3
+    },
+    {
+      "rank": 30,
+      "symbol": "IFX.DE",
+      "composite_score": 75.66,
+      "data_coverage": 3
+    },
+    {
+      "rank": 31,
+      "symbol": "VRT",
+      "composite_score": 75.56,
+      "data_coverage": 3
+    },
+    {
+      "rank": 32,
+      "symbol": "ZS",
+      "composite_score": 75.51,
+      "data_coverage": 3
+    },
+    {
+      "rank": 33,
+      "symbol": "NET",
+      "composite_score": 74.67,
+      "data_coverage": 3
+    },
+    {
+      "rank": 34,
+      "symbol": "LLY",
+      "composite_score": 73.43,
+      "data_coverage": 3
+    },
+    {
+      "rank": 35,
+      "symbol": "STMPA.PA",
+      "composite_score": 73.18,
+      "data_coverage": 3
+    },
+    {
+      "rank": 36,
+      "symbol": "PLTR",
+      "composite_score": 73.15,
+      "data_coverage": 3
+    },
+    {
+      "rank": 37,
+      "symbol": "LRCX",
+      "composite_score": 73.09,
+      "data_coverage": 3
+    },
+    {
+      "rank": 38,
+      "symbol": "ADYEN.AS",
+      "composite_score": 72.35,
+      "data_coverage": 3
+    },
+    {
+      "rank": 39,
+      "symbol": "MELI",
+      "composite_score": 71.84,
+      "data_coverage": 3
+    },
+    {
+      "rank": 40,
+      "symbol": "S",
+      "composite_score": 71.56,
+      "data_coverage": 3
+    },
+    {
+      "rank": 41,
+      "symbol": "META",
+      "composite_score": 71.47,
+      "data_coverage": 3
+    },
+    {
+      "rank": 42,
+      "symbol": "DASH",
+      "composite_score": 71.09,
+      "data_coverage": 3
+    },
+    {
+      "rank": 43,
+      "symbol": "WISE.L",
+      "composite_score": 70.76,
+      "data_coverage": 3
+    },
+    {
+      "rank": 44,
+      "symbol": "EL.PA",
+      "composite_score": 70.76,
+      "data_coverage": 3
+    },
+    {
+      "rank": 45,
+      "symbol": "PANW",
+      "composite_score": 70.68,
+      "data_coverage": 3
+    },
+    {
+      "rank": 46,
+      "symbol": "AZN.L",
+      "composite_score": 69.54,
+      "data_coverage": 3
+    },
+    {
+      "rank": 47,
+      "symbol": "KLAC",
+      "composite_score": 69.01,
+      "data_coverage": 3
+    },
+    {
+      "rank": 48,
+      "symbol": "BC8.DE",
+      "composite_score": 68.95,
+      "data_coverage": 3
+    },
+    {
+      "rank": 49,
+      "symbol": "TOST",
+      "composite_score": 68.29,
+      "data_coverage": 3
+    },
+    {
+      "rank": 50,
+      "symbol": "CAP.PA",
+      "composite_score": 67.58,
+      "data_coverage": 3
+    },
+    {
+      "rank": 51,
+      "symbol": "AIR.PA",
+      "composite_score": 67.31,
+      "data_coverage": 3
+    },
+    {
+      "rank": 52,
+      "symbol": "SHOP",
+      "composite_score": 66.73,
+      "data_coverage": 2
+    },
+    {
+      "rank": 53,
+      "symbol": "ARM",
+      "composite_score": 65.57,
+      "data_coverage": 3
+    },
+    {
+      "rank": 54,
+      "symbol": "ABI.BR",
+      "composite_score": 65.26,
+      "data_coverage": 3
+    },
+    {
+      "rank": 55,
+      "symbol": "MSFT",
+      "composite_score": 64.9,
+      "data_coverage": 3
+    },
+    {
+      "rank": 56,
+      "symbol": "RBLX",
+      "composite_score": 64.56,
+      "data_coverage": 3
+    },
+    {
+      "rank": 57,
+      "symbol": "SMCI",
+      "composite_score": 64.54,
+      "data_coverage": 2
+    },
+    {
+      "rank": 58,
+      "symbol": "COST",
+      "composite_score": 64.41,
+      "data_coverage": 3
+    },
+    {
+      "rank": 59,
+      "symbol": "ZAL.DE",
+      "composite_score": 64.3,
+      "data_coverage": 2
+    },
+    {
+      "rank": 60,
+      "symbol": "SOFI",
+      "composite_score": 64.27,
+      "data_coverage": 3
+    },
+    {
+      "rank": 61,
+      "symbol": "NFLX",
+      "composite_score": 63.16,
+      "data_coverage": 3
+    },
+    {
+      "rank": 62,
+      "symbol": "HOOD",
+      "composite_score": 62.98,
+      "data_coverage": 3
+    },
+    {
+      "rank": 63,
+      "symbol": "INTU",
+      "composite_score": 62.47,
+      "data_coverage": 3
+    },
+    {
+      "rank": 64,
+      "symbol": "SAN.PA",
+      "composite_score": 62.07,
+      "data_coverage": 3
+    },
+    {
+      "rank": 65,
+      "symbol": "ESTC",
+      "composite_score": 61.12,
+      "data_coverage": 3
+    },
+    {
+      "rank": 66,
+      "symbol": "CRWD",
+      "composite_score": 60.79,
+      "data_coverage": 3
+    },
+    {
+      "rank": 67,
+      "symbol": "SAP.DE",
+      "composite_score": 60.57,
+      "data_coverage": 3
+    },
+    {
+      "rank": 68,
+      "symbol": "BNP.PA",
+      "composite_score": 60.37,
+      "data_coverage": 3
+    },
+    {
+      "rank": 69,
+      "symbol": "SHEL.L",
+      "composite_score": 58.48,
+      "data_coverage": 3
+    },
+    {
+      "rank": 70,
+      "symbol": "V",
+      "composite_score": 57.13,
+      "data_coverage": 3
+    },
+    {
+      "rank": 71,
+      "symbol": "GTLB",
+      "composite_score": 56.68,
+      "data_coverage": 3
+    },
+    {
+      "rank": 72,
+      "symbol": "INVE-B.ST",
+      "composite_score": 56.38,
+      "data_coverage": 2
+    },
+    {
+      "rank": 73,
+      "symbol": "TEAM",
+      "composite_score": 56.01,
+      "data_coverage": 3
+    },
+    {
+      "rank": 74,
+      "symbol": "SAF.PA",
+      "composite_score": 55.8,
+      "data_coverage": 3
+    },
+    {
+      "rank": 75,
+      "symbol": "SU.PA",
+      "composite_score": 55.7,
+      "data_coverage": 3
+    },
+    {
+      "rank": 76,
+      "symbol": "CRM",
+      "composite_score": 52.05,
+      "data_coverage": 3
+    },
+    {
+      "rank": 77,
+      "symbol": "ENEL.MI",
+      "composite_score": 51.23,
+      "data_coverage": 3
+    },
+    {
+      "rank": 78,
+      "symbol": "WDAY",
+      "composite_score": 50.99,
+      "data_coverage": 3
+    },
+    {
+      "rank": 79,
+      "symbol": "SIE.DE",
+      "composite_score": 50.95,
+      "data_coverage": 3
+    },
+    {
+      "rank": 80,
+      "symbol": "STLAM.MI",
+      "composite_score": 50.78,
+      "data_coverage": 2
+    },
+    {
+      "rank": 81,
+      "symbol": "RR.L",
+      "composite_score": 50.71,
+      "data_coverage": 2
+    },
+    {
+      "rank": 82,
+      "symbol": "TSLA",
+      "composite_score": 50.44,
+      "data_coverage": 3
+    },
+    {
+      "rank": 83,
+      "symbol": "RACE.MI",
+      "composite_score": 50.43,
+      "data_coverage": 3
+    },
+    {
+      "rank": 84,
+      "symbol": "ROG.SW",
+      "composite_score": 50.0,
+      "data_coverage": 0
+    },
+    {
+      "rank": 85,
+      "symbol": "GSK.L",
+      "composite_score": 49.52,
+      "data_coverage": 3
+    },
+    {
+      "rank": 86,
+      "symbol": "FTNT",
+      "composite_score": 49.17,
+      "data_coverage": 3
+    },
+    {
+      "rank": 87,
+      "symbol": "ISP.MI",
+      "composite_score": 48.66,
+      "data_coverage": 3
+    },
+    {
+      "rank": 88,
+      "symbol": "NOW",
+      "composite_score": 48.19,
+      "data_coverage": 3
+    },
+    {
+      "rank": 89,
+      "symbol": "NOKIA.HE",
+      "composite_score": 47.55,
+      "data_coverage": 3
+    },
+    {
+      "rank": 90,
+      "symbol": "ATCO-A.ST",
+      "composite_score": 47.03,
+      "data_coverage": 3
+    },
+    {
+      "rank": 91,
+      "symbol": "SAN.MC",
+      "composite_score": 46.28,
+      "data_coverage": 3
+    },
+    {
+      "rank": 92,
+      "symbol": "OR.PA",
+      "composite_score": 46.03,
+      "data_coverage": 3
+    },
+    {
+      "rank": 93,
+      "symbol": "ITX.MC",
+      "composite_score": 45.32,
+      "data_coverage": 3
+    },
+    {
+      "rank": 94,
+      "symbol": "ABNB",
+      "composite_score": 43.59,
+      "data_coverage": 3
+    },
+    {
+      "rank": 95,
+      "symbol": "AAPL",
+      "composite_score": 42.8,
+      "data_coverage": 3
+    },
+    {
+      "rank": 96,
+      "symbol": "HUBS",
+      "composite_score": 42.65,
+      "data_coverage": 3
+    },
+    {
+      "rank": 97,
+      "symbol": "IBE.MC",
+      "composite_score": 41.69,
+      "data_coverage": 3
+    },
+    {
+      "rank": 98,
+      "symbol": "ADBE",
+      "composite_score": 40.3,
+      "data_coverage": 3
+    },
+    {
+      "rank": 99,
+      "symbol": "BAS.DE",
+      "composite_score": 39.95,
+      "data_coverage": 3
+    },
+    {
+      "rank": 100,
+      "symbol": "HSBA.L",
+      "composite_score": 39.86,
+      "data_coverage": 3
+    },
+    {
+      "rank": 101,
+      "symbol": "UBSG.SW",
+      "composite_score": 39.79,
+      "data_coverage": 3
+    },
+    {
+      "rank": 102,
+      "symbol": "ALV.DE",
+      "composite_score": 36.56,
+      "data_coverage": 3
+    },
+    {
+      "rank": 103,
+      "symbol": "DUOL",
+      "composite_score": 31.51,
+      "data_coverage": 3
+    },
+    {
+      "rank": 104,
+      "symbol": "BBVA.MC",
+      "composite_score": 31.41,
+      "data_coverage": 3
+    },
+    {
+      "rank": 105,
+      "symbol": "SOON.SW",
+      "composite_score": 29.33,
+      "data_coverage": 3
+    }
+  ]
+}
