@@ -1,80 +1,81 @@
-# 📈 Weekly Stock Watchlist — week of 2026-10-19
+# 📈 Weekly Stock Watchlist — week of 2026-10-26
 
-*Generated 2026-10-19T15:16:44+00:00 · horizon ≤ 90 days (~3 months) · regions: US, EU*
+*Generated 2026-10-26T14:51:20+00:00 · horizon ≤ 90 days (~3 months) · regions: US, EU*
 
 Screened **138** American & European candidates; **104** qualified as growing stocks. Each list below ranks the qualifiers by a different lens.
 
 > ⚠️ **Not investment advice.** Generated automatically from public fundamental & analyst data for research/education only. Do your own due diligence.
 
-## 🔁 What changed since 2026-10-12
+## 🔁 What changed since 2026-10-19
 
-🔴 **Dropped out (1):** `INVE-B.ST`
+🟢 **Entered (1):** `VOLV-B.ST`
+🔴 **Dropped out (1):** `TSLA`
 
 **Biggest rank moves**
 
 | Symbol | Was | Now | Move |
 |--------|----:|----:|:-----|
-| `SMCI` | 56 | 14 | 🔺 42 |
-| `NET` | 82 | 51 | 🔺 31 |
-| `S` | 96 | 65 | 🔺 31 |
-| `CRWD` | 97 | 70 | 🔺 27 |
-| `PANW` | 84 | 57 | 🔺 27 |
+| `META` | 60 | 16 | 🔺 44 |
+| `ZS` | 61 | 95 | 🔻 34 |
+| `IOT` | 15 | 47 | 🔻 32 |
+| `MDB` | 21 | 50 | 🔻 29 |
+| `ATCO-A.ST` | 73 | 52 | 🔺 21 |
 
 ## 🏆 Top Overall (composite)
 | # | Symbol | Name | Region | Composite | Upside | Growth | Consensus | 3M Trend | Data |
 |---|--------|------|--------|----------:|-------:|-------:|----------:|---------:|:----:|
-| 1 | `NVDA` | NVIDIA | US | 98.2 | 100 | 100 | 93 | +7.4% | ✅ 3/3 |
-| 2 | `CRDO` | Credo Technology | US | 97.8 | 100 | 100 | 91 | -16.9% | ✅ 3/3 |
-| 3 | `ARGX.BR` | argenx | EU | 97.1 | 100 | 100 | 88 | -3.2% | ✅ 3/3 |
-| 4 | `RKLB` | Rocket Lab | US | 94.3 | 100 | 95 | 85 | -20.4% | ✅ 3/3 |
-| 5 | `AVGO` | Broadcom | US | 93.9 | 100 | 87 | 94 | -10.4% | ✅ 3/3 |
-| 6 | `APP` | AppLovin | US | 92.0 | 100 | 87 | 86 | -37.3% | ✅ 3/3 |
-| 7 | `ASML.AS` | ASML Holding | EU | 91.7 | 100 | 83 | 91 | -2.2% | ✅ 3/3 |
-| 8 | `MU` | Micron Technology | US | 90.1 | 100 | 78 | 91 | +6.4% | ✅ 3/3 |
-| 9 | `HOOD` | Robinhood Markets | US | 90.1 | 100 | 84 | 83 | -0.0% | ✅ 3/3 |
-| 10 | `ASTS` | AST SpaceMobile | US | 89.9 | 100 | 100 | 60 | -25.2% | ✅ 3/3 |
+| 1 | `NVDA` | NVIDIA | US | 98.2 | 100 | 100 | 93 | +10.5% | ✅ 3/3 |
+| 2 | `CRDO` | Credo Technology | US | 97.8 | 100 | 100 | 91 | -27.0% | ✅ 3/3 |
+| 3 | `MU` | Micron Technology | US | 97.7 | 100 | 100 | 91 | -0.3% | ✅ 3/3 |
+| 4 | `ARGX.BR` | argenx | EU | 94.8 | 94 | 100 | 88 | -0.6% | ✅ 3/3 |
+| 5 | `RKLB` | Rocket Lab | US | 94.5 | 100 | 95 | 85 | -19.4% | ✅ 3/3 |
+| 6 | `AVGO` | Broadcom | US | 93.8 | 100 | 87 | 93 | -14.0% | ✅ 3/3 |
+| 7 | `APP` | AppLovin | US | 92.0 | 100 | 87 | 86 | -36.7% | ✅ 3/3 |
+| 8 | `ASML.AS` | ASML Holding | EU | 91.7 | 100 | 83 | 91 | -0.4% | ✅ 3/3 |
+| 9 | `LRCX` | Lam Research | US | 90.6 | 100 | 80 | 90 | -18.0% | ✅ 3/3 |
+| 10 | `ASTS` | AST SpaceMobile | US | 90.4 | 100 | 100 | 62 | -31.2% | ✅ 3/3 |
 
 ## 🚀 Biggest Upside (analyst price target vs. price)
 | # | Symbol | Name | Region | Upside Score | Detail | Price | Target |
 |---|--------|------|--------|------------:|-------:|------:|-------:|
-| 1 | `NVDA` | NVIDIA | US | 100 | +50.7% | $218.13 | $328.72 |
-| 2 | `AVGO` | Broadcom | US | 100 | +55.9% | $338.32 | $527.59 |
-| 3 | `ORCL` | Oracle | US | 100 | +82.6% | $129.98 | $237.36 |
-| 4 | `NFLX` | Netflix | US | 100 | +30.6% | $69.76 | $91.13 |
-| 5 | `AMAT` | Applied Materials | US | 100 | +47.7% | $425.13 | $627.83 |
-| 6 | `SNOW` | Snowflake | US | 100 | +34.2% | $316.88 | $425.14 |
-| 7 | `UBER` | Uber Technologies | US | 100 | +42.6% | $70.74 | $100.86 |
-| 8 | `MU` | Micron Technology | US | 100 | +69.5% | $920.49 | $1,560.57 |
-| 9 | `LRCX` | Lam Research | US | 100 | +35.2% | $277.95 | $375.81 |
-| 10 | `KLAC` | KLA Corporation | US | 100 | +35.7% | $171.50 | $232.77 |
+| 1 | `NVDA` | NVIDIA | US | 100 | +51.7% | $216.87 | $328.95 |
+| 2 | `AMZN` | Amazon | US | 100 | +32.6% | $250.22 | $331.72 |
+| 3 | `GOOGL` | Alphabet | US | 100 | +33.7% | $320.98 | $429.12 |
+| 4 | `META` | Meta Platforms | US | 100 | +30.7% | $646.27 | $844.77 |
+| 5 | `AVGO` | Broadcom | US | 100 | +60.8% | $329.08 | $529.10 |
+| 6 | `ORCL` | Oracle | US | 100 | +86.0% | $127.16 | $236.54 |
+| 7 | `NFLX` | Netflix | US | 100 | +30.6% | $64.98 | $84.83 |
+| 8 | `AMAT` | Applied Materials | US | 100 | +62.9% | $385.51 | $627.83 |
+| 9 | `UBER` | Uber Technologies | US | 100 | +51.5% | $66.56 | $100.86 |
+| 10 | `MELI` | MercadoLibre | US | 100 | +40.9% | $1,613.36 | $2,273.86 |
 
 ## 📊 Financial Growth History (revenue growth)
 | # | Symbol | Name | Region | Growth Score | Detail | Price | Target |
 |---|--------|------|--------|------------:|-------:|------:|-------:|
-| 1 | `NVDA` | NVIDIA | US | 100 | +105.9% | $218.13 | $328.72 |
-| 2 | `SMCI` | Super Micro Computer | US | 100 | +93.2% | $32.87 | $42.27 |
-| 3 | `CRDO` | Credo Technology | US | 100 | +114.7% | $176.29 | $279.09 |
-| 4 | `ASTS` | AST SpaceMobile | US | 100 | +2626.6% | $42.96 | $74.28 |
-| 5 | `ARGX.BR` | argenx | EU | 100 | +59.3% | €729.60 | €1,010.22 |
-| 6 | `RKLB` | Rocket Lab | US | 95 | +62.0% | $52.35 | $102.15 |
-| 7 | `PLTR` | Palantir Technologies | US | 91 | +92.8% | $195.16 | $206.43 |
-| 8 | `APP` | AppLovin | US | 87 | +52.8% | $266.33 | $480.08 |
-| 9 | `AVGO` | Broadcom | US | 87 | +85.5% | $338.32 | $527.59 |
-| 10 | `HOOD` | Robinhood Markets | US | 84 | +32.3% | $99.25 | $134.38 |
+| 1 | `NVDA` | NVIDIA | US | 100 | +105.9% | $216.87 | $328.95 |
+| 2 | `MU` | Micron Technology | US | 100 | +379.3% | $897.18 | $1,561.91 |
+| 3 | `SMCI` | Super Micro Computer | US | 100 | +93.2% | $33.09 | $43.27 |
+| 4 | `CRDO` | Credo Technology | US | 100 | +114.7% | $151.95 | $284.05 |
+| 5 | `ASTS` | AST SpaceMobile | US | 100 | +2626.6% | $40.09 | $74.68 |
+| 6 | `ARGX.BR` | argenx | EU | 100 | +52.1% | €784.80 | €1,002.74 |
+| 7 | `RKLB` | Rocket Lab | US | 95 | +62.0% | $53.97 | $102.15 |
+| 8 | `PLTR` | Palantir Technologies | US | 91 | +92.8% | $197.76 | $206.66 |
+| 9 | `APP` | AppLovin | US | 87 | +52.8% | $261.35 | $471.69 |
+| 10 | `AVGO` | Broadcom | US | 87 | +85.5% | $329.08 | $529.10 |
 
 ## 👥 Analyst Consensus
 | # | Symbol | Name | Region | Consensus Score | Detail | Price | Target |
 |---|--------|------|--------|------------:|-------:|------:|-------:|
-| 1 | `AVGO` | Broadcom | US | 94 | Strong Buy | $338.32 | $527.59 |
-| 2 | `ANET` | Arista Networks | US | 93 | Strong Buy | $182.98 | $245.14 |
-| 3 | `NVDA` | NVIDIA | US | 93 | Strong Buy | $218.13 | $328.72 |
-| 4 | `AMZN` | Amazon | US | 92 | Strong Buy | $262.13 | $331.46 |
-| 5 | `MSFT` | Microsoft | US | 92 | Strong Buy | $534.32 | $599.24 |
-| 6 | `CRDO` | Credo Technology | US | 91 | Strong Buy | $176.29 | $279.09 |
-| 7 | `ASML.AS` | ASML Holding | EU | 91 | Strong Buy | €1,486.00 | €2,107.73 |
-| 8 | `VRT` | Vertiv Holdings | US | 91 | Strong Buy | $209.10 | $333.71 |
-| 9 | `MU` | Micron Technology | US | 91 | Strong Buy | $920.49 | $1,560.57 |
-| 10 | `GOOGL` | Alphabet | US | 91 | Strong Buy | $345.68 | $430.51 |
+| 1 | `AVGO` | Broadcom | US | 93 | Strong Buy | $329.08 | $529.10 |
+| 2 | `ANET` | Arista Networks | US | 93 | Strong Buy | $176.79 | $243.59 |
+| 3 | `NVDA` | NVIDIA | US | 93 | Strong Buy | $216.87 | $328.95 |
+| 4 | `MSFT` | Microsoft | US | 92 | Strong Buy | $529.98 | $601.73 |
+| 5 | `AMZN` | Amazon | US | 92 | Strong Buy | $250.22 | $331.72 |
+| 6 | `CRDO` | Credo Technology | US | 91 | Strong Buy | $151.95 | $284.05 |
+| 7 | `ASML.AS` | ASML Holding | EU | 91 | Strong Buy | €1,422.80 | €2,097.45 |
+| 8 | `VRT` | Vertiv Holdings | US | 91 | Strong Buy | $198.31 | $333.00 |
+| 9 | `MU` | Micron Technology | US | 91 | Strong Buy | $897.18 | $1,561.91 |
+| 10 | `GOOGL` | Alphabet | US | 91 | Strong Buy | $320.98 | $429.12 |
 
 ## 🔍 Data quality
 
